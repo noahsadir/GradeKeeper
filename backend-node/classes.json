@@ -1,0 +1,67 @@
+{
+  "classes": {
+    "83HD39jdw$jd": {
+      "name": "Systems Programming",
+      "identifier": "CSCI 1730",
+      "color": "#2255AA",
+      "weight": 4,
+      "grade_scale": {
+        "A": {
+          "min": 93,
+          "credit": 4.0
+        },
+        "A-": {
+          "min": 89,
+          "credit": 3.7
+        },
+        "B+": {
+          "min": 87,
+          "credit": 3.3
+        },
+        "B": {
+          "min": 83,
+          "credit": 3.0
+        },
+        "B-": {
+          "min": 79,
+          "credit": 2.7
+        },
+        "C+": {
+          "min": 77,
+          "credit": 2.3
+        },
+        "C": {
+          "min": 73,
+          "credit": 2.0
+        },
+        "C-": {
+          "min": 70,
+          "credit": 1.7
+        },
+        "D": {
+          "min": 60,
+          "credit": 1.0
+        },
+        "F": {
+          "min": 0,
+          "credit": 0
+        }
+      },
+      "categories": {
+        "homework": {
+          "weight": 15,
+          "items": {
+            "3mdj(#jfd9e2)": {
+              "title": "HW 1",
+              "description": null,
+              "grade": null,
+              "score": 95,
+              "max": 100,
+              "weight": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}
