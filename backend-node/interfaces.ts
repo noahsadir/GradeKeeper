@@ -12,3 +12,9 @@ export interface QueryError {
   sqlState: string,
   fatal: boolean
 }
+
+export interface CreateUserArgs {
+  api_key: string;
+  email: string;
+  password: string;
+}
