@@ -129,9 +129,9 @@ function performAction(con: any, req: any, res: any, body: CreateUserArgs, callb
         if (!err) {
 
           //Insert new user into database
-          var sql = "INSERT INTO logins (email, password, internal_id) VALUES ('" + body.email + "', '" + hash + "', '" + internalID + "')";
-
-          con.query(sql, function (err: Object, result: Object) {
+          var sql = "INSERT INTO logins (email, password, internal_id) VALUES (?, ?, ?)";
+          var args: [string] = [body.email, hash, internalID];
+          con.query(sql, args, function (err: Object, result: Object) {
             if (!err) {
               callback(200, {
                 success: true,
@@ -146,11 +146,6 @@ function performAction(con: any, req: any, res: any, body: CreateUserArgs, callb
             }
           });
           
-          callback(500, {
-            success: false,
-            error: "ERR_DATABASE_INSERT",
-            message: "Unable to store user in database."
-          });
         } else {
           callback(500, {
             success: false,

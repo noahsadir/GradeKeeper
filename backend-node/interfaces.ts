@@ -2,7 +2,6 @@ export interface Credentials {
   host: string;
   user: string;
   password: string;
-  api_key: string;
 }
 
 export interface QueryError {
@@ -14,6 +13,12 @@ export interface QueryError {
 }
 
 export interface CreateUserArgs {
+  api_key: string;
+  email: string;
+  password: string;
+}
+
+export interface AuthenticateUserArgs {
   api_key: string;
   email: string;
   password: string;
