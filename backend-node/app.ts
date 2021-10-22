@@ -1,3 +1,10 @@
+/*******************************
+ * app.ts                      *
+ * --------------------------- *
+ * Created by Noah Sadir       *
+ *         on October 19, 2021 *
+ *******************************/
+
 import express from 'express';
 import * as bodyParser from "body-parser";
 
@@ -7,6 +14,7 @@ import {
 } from './interfaces';
 
 import { createUser } from './create_user';
+import { authenticateUser } from './authenticate_user';
 
 var mysql = require('mysql2');
 
@@ -24,6 +32,10 @@ con.connect(function(err: QueryError) {
 
 app.post('/create_user', (req, res) => {
   createUser(con, req, res);
+});
+
+app.post('/authenticate_user', (req, res) => {
+  authenticateUser(con, req, res);
 });
 
 app.get('*', (req, res) => {

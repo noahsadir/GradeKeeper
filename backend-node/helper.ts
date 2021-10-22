@@ -1,3 +1,10 @@
+/*******************************
+ * helper.ts                   *
+ * --------------------------- *
+ * Created by Noah Sadir       *
+ *         on October 19, 2021 *
+ *******************************/
+
 import bcrypt from 'bcrypt';
 import * as crypto from "crypto";
 import {
@@ -26,6 +33,21 @@ export function occurrencesInTable(con: any, table: string, column: string, valu
   });
 }
 
+
+export function selectFromWhere(con: any, desired: string, table: string, column: string, value: string, callback: (result: any, err: QueryError) => void) {
+  var sql = "SELECT `" + desired + "` FROM `" + table + "` WHERE `" + column + "` = ?";
+  var args: [string] = [value];
+  con.query(sql, args, function(err: QueryError, result: any[], fields: Object) {
+    if (err) {
+      callback(null, err);
+    } else if (result.length != 1) {
+      callback(null, null);
+    } else {
+      callback(result[0][desired], null);
+    }
+  });
+}
+
 export function checkAPIKey(con: any, apiKey: string, callback: (success: boolean, error: QueryError) => void) {
   occurrencesInTable(con, "api_keys", "api_key", apiKey, (count: number, err: QueryError) => {
     if (count == null) {
@@ -38,9 +60,54 @@ export function checkAPIKey(con: any, apiKey: string, callback: (success: boolea
   });
 }
 
-export function hashPassword(password: string, callback: (err: Object, hash: String) => void) {
+export function hashPassword(password: string, callback: (err: Object, hash: string) => void) {
   bcrypt.hash(password, 10, function(err, hash) {
     callback(err, hash);
+  });
+}
+
+export function verifyPassword(con: any, email: string, password: string, callback: (isCorrect: boolean, err: Object) => void) {
+  var sql = "SELECT `password` FROM `logins` WHERE `email` = ?";
+  var args: [string] = [email];
+  con.query(sql, args, function(err: QueryError, result: any[], fields: Object) {
+    if (err) {
+      callback(null, err);
+    } else if (result.length != 1) {
+      callback(null, null);
+    } else {
+      var hash: string = result[0]['password'];
+      bcrypt.compare(password, hash, (err: Object, res: boolean) => {
+        if (err) {
+          callback(null, err);
+        } else {
+          callback(res, null);
+        }
+      });
+    }
+  });
+}
+
+export function verifyToken(con: any, internalID: string, token: string, callback: (authStat: number, err: Object) => void) {
+  var sql = "SELECT `token`, `expiration` FROM `logins` WHERE `internal_id` = ?";
+  var args: [string] = [internalID];
+  con.query(sql, args, (err: QueryError, result: any[], fields: Object) => {
+    if (err) {
+      callback(0, err);
+    } else if (result.length != 1) {
+      callback(2, null);
+    } else {
+      var fetchedToken: string = result[0]['token'];
+      var expiration: number = result[0]['expiration'];
+      if (token == fetchedToken) {
+        if (expiration > Math.round(Date.now / 1000)) {
+          callback(1, null);
+        } else {
+          callback(4, null);
+        }
+      } else {
+        callback(3, null);
+      }
+    }
   });
 }
 

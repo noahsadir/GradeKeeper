@@ -1,3 +1,10 @@
+/*******************************
+ * create_user.ts              *
+ * --------------------------- *
+ * Created by Noah Sadir       *
+ *         on October 19, 2021 *
+ *******************************/
+
 import {
   Credentials,
   QueryError,
@@ -12,7 +19,7 @@ import {
 } from './helper';
 
 /**
- * Create a new user
+ * Create a new user.
  *
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
@@ -130,7 +137,7 @@ function performAction(con: any, req: any, res: any, body: CreateUserArgs, callb
 
           //Insert new user into database
           var sql = "INSERT INTO logins (email, password, internal_id) VALUES (?, ?, ?)";
-          var args: [string] = [body.email, hash, internalID];
+          var args: [string, string, string] = [body.email, hash, internalID];
           con.query(sql, args, function (err: Object, result: Object) {
             if (!err) {
               callback(200, {
@@ -145,7 +152,7 @@ function performAction(con: any, req: any, res: any, body: CreateUserArgs, callb
               });
             }
           });
-          
+
         } else {
           callback(500, {
             success: false,
