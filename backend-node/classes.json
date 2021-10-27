@@ -1,65 +1,86 @@
 {
   "classes": {
-    "83HD39jdw$jd": {
+    "beab924411ed26d1": {
       "name": "Systems Programming",
-      "identifier": "CSCI 1730",
-      "color": "#2255AA",
+      "code": "CSCI 1730",
+      "color": 1,
       "weight": 4,
       "grade_scale": {
         "A": {
-          "min": 93,
-          "credit": 4.0
+          "min_score": 93,
+          "max_score": null,
+          "credit": 4
         },
         "A-": {
-          "min": 89,
-          "credit": 3.7
+          "min_score": 90,
+          "max_score": 93,
+          "credit": 4
         },
         "B+": {
-          "min": 87,
-          "credit": 3.3
+          "min_score": 87,
+          "max_score": 90,
+          "credit": 3
         },
         "B": {
-          "min": 83,
-          "credit": 3.0
+          "min_score": 83,
+          "max_score": 87,
+          "credit": 3
         },
         "B-": {
-          "min": 79,
-          "credit": 2.7
+          "min_score": 80,
+          "max_score": 83,
+          "credit": 3
         },
         "C+": {
-          "min": 77,
-          "credit": 2.3
+          "min_score": 77,
+          "max_score": 80,
+          "credit": 2
         },
         "C": {
-          "min": 73,
-          "credit": 2.0
+          "min_score": 73,
+          "max_score": 77,
+          "credit": 2
         },
         "C-": {
-          "min": 70,
-          "credit": 1.7
+          "min_score": 70,
+          "max_score": 73,
+          "credit": 2
         },
         "D": {
-          "min": 60,
-          "credit": 1.0
+          "min_score": 60,
+          "max_score": 70,
+          "credit": 1
         },
         "F": {
-          "min": 0,
+          "min_score": 0,
+          "max_score": 60,
           "credit": 0
         }
       },
       "categories": {
-        "Homework": {
+        "44ef5b81cdc33905": {
+          "category_name": "Labs",
+          "drop_count": 0,
           "weight": 15,
-          "items": {
-            "3mdj(#jfd9e2)": {
-              "title": "HW 1",
-              "description": null,
-              "grade": null,
-              "score": 95,
-              "max": 100,
-              "weight": 1
-            }
-          }
+          "assignments": {}
+        },
+        "97dbfe272f6e7398": {
+          "category_name": "Projects",
+          "drop_count": 0,
+          "weight": 30,
+          "assignments": {}
+        },
+        "7ec807da57a9ed97": {
+          "category_name": "Midterm",
+          "drop_count": 0,
+          "weight": 25,
+          "assignments": {}
+        },
+        "d553e4ea3469946a": {
+          "category_name": "Final Exam",
+          "drop_count": 0,
+          "weight": 30,
+          "assignments": {}
         }
       }
     }

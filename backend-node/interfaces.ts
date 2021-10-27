@@ -49,9 +49,27 @@ export interface CreateGradeArgs {
   token: string; // required
   class_id: string; // required
   grade_id: string; // required
-  min_score: number;
+  min_score: number; // required
   max_score: number;
   credit: number;
+}
+
+export interface CreateAssignmentArgs {
+  internal_id: string; // required
+  token: string; // required
+  class_id: string; // required
+  category_id: string; // required
+  title: string;
+  description: string;
+  grade_id: string;
+  act_score: number;
+  max_score: number;
+  weight: number;
+  penalty: number;
+  due_date: number;
+  assign_date: number;
+  graded_date: number;
+  modify_date: number;
 }
 
 export interface GetClassesArgs {
@@ -64,9 +82,17 @@ export interface GetStructureArgs {
   token: string; // required
 }
 
+export interface GetAssignmentsArgs {
+  internal_id: string; // required
+  token: string; // required
+  class_id: string; // required
+  ignore_before_date: number;
+}
+
 export interface GetLogsArgs {
   api_key: string
 }
+
 
 /* Gradebook Objects */
 

@@ -13,14 +13,18 @@ import {
   QueryError
 } from './interfaces';
 
-import { createUser } from './create_user';
 import { authenticateUser } from './authenticate_user';
+
+import { createUser } from './create_user';
 import { createClass } from './create_class';
-import { getClasses } from './get_classes';
-import { getLogs } from './get_logs';
 import { createCategory } from './create_category';
 import { createGrade } from './create_grade';
+import { createAssignment } from './create_assignment';
+
+import { getClasses } from './get_classes';
+import { getLogs } from './get_logs';
 import { getStructure } from './get_structure';
+import { getAssignments } from './get_assignments';
 
 var mysql = require('mysql2');
 
@@ -66,6 +70,11 @@ app.post('/get_logs', (req, res) => {
   getLogs(con, req, res);
 });
 
+app.post('/get_assignments', (req, res) => {
+  logRequest("post", "get_assignments", req);
+  getAssignments(con, req, res);
+});
+
 app.post('/create_category', (req, res) => {
   logRequest("post", "create_category", req);
   createCategory(con, req, res);
@@ -74,6 +83,11 @@ app.post('/create_category', (req, res) => {
 app.post('/create_grade', (req, res) => {
   logRequest("post", "create_grade", req);
   createGrade(con, req, res);
+});
+
+app.post('/create_assignment', (req, res) => {
+  logRequest("post", "create_assignment", req);
+  createAssignment(con, req, res);
 });
 
 app.get('*', (req, res) => {
