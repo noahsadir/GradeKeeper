@@ -1,6 +1,6 @@
 # Database Layout
 
-* Required
+*Required
 
 ## logins
 
@@ -34,9 +34,9 @@ int* | varchar(16)* | varchar(8) | decimal       | decimal       | decimal    |
 
 ## categories
 
-id   | class_id     | category_name  | weight |
----- | ------------ | -------------- | ------ |
-int* | varchar(16)* | varchar(32)*   | decimal    |
+id   | class_id     | category_name  | weight | drop_count
+---- | ------------ | -------------- | ------ | -------------
+int* | varchar(16)* | varchar(32)*   | decimal    | int
 
 ## item
 

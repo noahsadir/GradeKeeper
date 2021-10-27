@@ -13,7 +13,7 @@ import {
 
 import {
   checkAPIKey,
-  generateRandomString,
+  generateUniqueRandomString,
   hashPassword,
   occurrencesInTable
 } from './helper';
@@ -94,7 +94,7 @@ function validateInput(con: any, req: any, res: any, body: CreateUserArgs, callb
         if (apiKeySuccess == null) {
           callback(500, {
             success: false,
-            error: "ERR_SQL_QUERY",
+            error: "DBG_ERR_SQL_QUERY",
             message: "Unable to perform query.",
             details: apiKeyError
           });
@@ -128,7 +128,7 @@ function validateInput(con: any, req: any, res: any, body: CreateUserArgs, callb
  */
 function performAction(con: any, req: any, res: any, body: CreateUserArgs, callback: (statusCode: number, output: Object) => void) {
   //Generate internal ID
-  generateRandomString(16, (internalID: string) => {
+  generateUniqueRandomString(con, 16, "logins", "internal_id", (internalID: string) => {
     if (internalID != null) {
 
       //Hash password

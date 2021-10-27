@@ -13,7 +13,7 @@ import {
 
 import {
   checkAPIKey,
-  generateRandomString,
+  generateUniqueRandomString,
   hashPassword,
   verifyPassword,
   occurrencesInTable,
@@ -69,7 +69,7 @@ function validateInput(con: any, req: any, res: any, body: AuthenticateUserArgs,
                 if (vpassErr) {
                   callback(500, {
                     success: false,
-                    error: "ERR_SQL_QUERY",
+                    error: "DBG_ERR_SQL_QUERY",
                     message: "Unable to perform query",
                     details: vpassErr
                   });
@@ -100,7 +100,7 @@ function validateInput(con: any, req: any, res: any, body: AuthenticateUserArgs,
         if (apiKeySuccess == null) {
           callback(500, {
             success: false,
-            error: "ERR_SQL_QUERY",
+            error: "DBG_ERR_SQL_QUERY",
             message: "Unable to perform query.",
             details: apiKeyError
           });
@@ -134,7 +134,7 @@ function validateInput(con: any, req: any, res: any, body: AuthenticateUserArgs,
  */
 function performAction(con: any, req: any, res: any, body: AuthenticateUserArgs, callback: (statusCode: number, output: Object) => void) {
   //Generate temp token
-  generateRandomString(64, (token: string) => {
+  generateUniqueRandomString(con, 64, "tokens", "token", (token: string) => {
     if (token != null) {
       const expiration: number = Math.round(Date.now() / 1000) + 1800; // 30 minutes from now
 
@@ -162,7 +162,7 @@ function performAction(con: any, req: any, res: any, body: AuthenticateUserArgs,
                     } else {
                       callback(500, {
                         success: false,
-                        error: "ERR_SQL_QUERY",
+                        error: "DBG_ERR_SQL_QUERY",
                         message: "Unable to perform query.",
                         details: addtokErr
                       });
@@ -178,7 +178,7 @@ function performAction(con: any, req: any, res: any, body: AuthenticateUserArgs,
               } else {
                 callback(500, {
                   success: false,
-                  error: "ERR_SQL_QUERY",
+                  error: "DBG_ERR_SQL_QUERY",
                   message: "Unable to perform query.",
                   details: idoccErr
                 });
@@ -194,7 +194,7 @@ function performAction(con: any, req: any, res: any, body: AuthenticateUserArgs,
         } else {
           callback(500, {
             success: false,
-            error: "ERR_SQL_QUERY",
+            error: "DBG_ERR_SQL_QUERY",
             message: "Unable to perform query.",
             details: sfwErr
           });

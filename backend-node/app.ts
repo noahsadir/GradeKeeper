@@ -15,6 +15,12 @@ import {
 
 import { createUser } from './create_user';
 import { authenticateUser } from './authenticate_user';
+import { createClass } from './create_class';
+import { getClasses } from './get_classes';
+import { getLogs } from './get_logs';
+import { createCategory } from './create_category';
+import { createGrade } from './create_grade';
+import { getStructure } from './get_structure';
 
 var mysql = require('mysql2');
 
@@ -31,14 +37,47 @@ con.connect(function(err: QueryError) {
 });
 
 app.post('/create_user', (req, res) => {
+  logRequest("post", "create_user", req);
   createUser(con, req, res);
 });
 
 app.post('/authenticate_user', (req, res) => {
+  logRequest("post", "authenticate_user", req);
   authenticateUser(con, req, res);
 });
 
+app.post('/create_class', (req, res) => {
+  logRequest("post", "create_class", req);
+  createClass(con, req, res);
+});
+
+app.post('/get_classes', (req, res) => {
+  logRequest("post", "get_classes", req);
+  getClasses(con, req, res);
+});
+
+app.post('/get_structure', (req, res) => {
+  logRequest("post", "get_structure", req);
+  getStructure(con, req, res);
+});
+
+app.post('/get_logs', (req, res) => {
+  logRequest("post", "get_logs", req);
+  getLogs(con, req, res);
+});
+
+app.post('/create_category', (req, res) => {
+  logRequest("post", "create_category", req);
+  createCategory(con, req, res);
+});
+
+app.post('/create_grade', (req, res) => {
+  logRequest("post", "create_grade", req);
+  createGrade(con, req, res);
+});
+
 app.get('*', (req, res) => {
+  logRequest("get", "*", req);
   res.statusCode = 405;
   res.json({
     success: false,
@@ -48,6 +87,7 @@ app.get('*', (req, res) => {
 });
 
 app.post('*', (req, res) => {
+  logRequest("post", "*", req);
   res.statusCode = 400;
   res.json({
     success: false,
@@ -59,3 +99,17 @@ app.post('*', (req, res) => {
 app.listen(3000, () => {
     console.log('The application is listening on port 3000!');
 });
+
+function logRequest(method: string, callName: string, req: any) {
+  var body: any = req.body;
+  var internalID = null;
+  var apiKey = null;
+  if (body) {
+    internalID = body.internal_id;
+    apiKey = body.api_key;
+  }
+
+  var sql = "INSERT INTO usage_log (method, call_type, internal_id, api_key, timestamp) VALUES (?, ?, ?, ?, ?)";
+  var args: [string, string, string, string, number] = [method, callName, internalID, apiKey, Math.round(Date.now() / 1000)];
+  con.query(sql, args);
+}

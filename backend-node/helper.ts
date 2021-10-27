@@ -48,6 +48,18 @@ export function selectFromWhere(con: any, desired: string, table: string, column
   });
 }
 
+export function selectAllFromWhere(con: any, desired: string, table: string, column: string, value: string, callback: (result: any, err: QueryError) => void) {
+  var sql = "SELECT `" + desired + "` FROM `" + table + "` WHERE `" + column + "` = ?";
+  var args: [string] = [value];
+  con.query(sql, args, function(err: QueryError, result: any[], fields: Object) {
+    if (err) {
+      callback(null, err);
+    } else {
+      callback(result, null);
+    }
+  });
+}
+
 export function checkAPIKey(con: any, apiKey: string, callback: (success: boolean, error: QueryError) => void) {
   occurrencesInTable(con, "api_keys", "api_key", apiKey, (count: number, err: QueryError) => {
     if (count == null) {
@@ -88,7 +100,7 @@ export function verifyPassword(con: any, email: string, password: string, callba
 }
 
 export function verifyToken(con: any, internalID: string, token: string, callback: (authStat: number, err: Object) => void) {
-  var sql = "SELECT `token`, `expiration` FROM `logins` WHERE `internal_id` = ?";
+  var sql = "SELECT `token`, `expiration` FROM `tokens` WHERE `internal_id` = ?";
   var args: [string] = [internalID];
   con.query(sql, args, (err: QueryError, result: any[], fields: Object) => {
     if (err) {
@@ -99,7 +111,7 @@ export function verifyToken(con: any, internalID: string, token: string, callbac
       var fetchedToken: string = result[0]['token'];
       var expiration: number = result[0]['expiration'];
       if (token == fetchedToken) {
-        if (expiration > Math.round(Date.now / 1000)) {
+        if (expiration > Math.round(Date.now() / 1000)) {
           callback(1, null);
         } else {
           callback(4, null);
@@ -119,4 +131,47 @@ export function generateRandomString(length: number, callback: (str: string) => 
       callback(buffer.toString('hex').substring(0, length));
     }
   });
+}
+
+export function getEditPermissionsForClass(con: any, classID: string, internalID: string, callback: (hasPermission: boolean, err: QueryError) => void) {
+  var sql = "SELECT `id` FROM `edit_permissions` WHERE class_id = ? AND internal_id = ?";
+  var args: [string, string] = [classID, internalID];
+  con.query(sql, args, (editErr: QueryError, result: any[]) => {
+    if (editErr) {
+      callback(false, editErr);
+    } else {
+      if (result.length == 1) {
+        callback(true, null);
+      } else {
+        callback(false, null);
+      }
+    }
+  });
+}
+
+/**
+ * Generate random string and check table column to ensure no conflicts.
+ */
+export function generateUniqueRandomString(con: any, length: number, table: string, column: string, callback: (str: string) => void) {
+  crypto.randomBytes(length, function(err, buffer) {
+    if (err) {
+      callback(null);
+    } else {
+      var randStr: string = buffer.toString('hex').substring(0, length);
+      occurrencesInTable(con, table, column, randStr, (count: number, occErr: QueryError) => {
+        if (occErr || count != 0) {
+          callback(null);
+        } else {
+          callback(randStr);
+        }
+      });
+    }
+  });
+}
+
+export function numberFromSqlDec(decimalVal: string) {
+  if (decimalVal == null) {
+    return null;
+  }
+  return parseFloat(decimalVal);
 }
