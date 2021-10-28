@@ -72,6 +72,55 @@ export interface CreateAssignmentArgs {
   modify_date: number;
 }
 
+export interface ModifyClassArgs {
+  internal_id: string; // required
+  token: string; // required
+  class_id: string // required
+  class_name: string; // required
+  class_code: string;
+  color: number;
+  weight: number;
+}
+
+export interface ModifyCategoryArgs {
+  internal_id: string; // required
+  token: string; // required
+  class_id: string; // required
+  category_id: string;
+  category_name: string; //required
+  drop_count: number;
+  weight: number;
+}
+
+export interface ModifyGradeArgs {
+  internal_id: string; // required
+  token: string; // required
+  class_id: string; // required
+  grade_id: string; // required
+  min_score: number; // required
+  max_score: number;
+  credit: number;
+}
+
+export interface ModifyAssignmentArgs {
+  internal_id: string; // required
+  token: string; // required
+  class_id: string; // required
+  category_id: string; // required
+  assignment_id: string; // required
+  title: string;
+  description: string;
+  grade_id: string;
+  act_score: number;
+  max_score: number;
+  weight: number;
+  penalty: number;
+  due_date: number;
+  assign_date: number;
+  graded_date: number;
+  modify_date: number;
+}
+
 export interface GetClassesArgs {
   internal_id: string; // required
   token: string; // required

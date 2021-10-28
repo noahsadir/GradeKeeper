@@ -1,20 +1,21 @@
 /*******************************
- * modify_class.ts             *
+ * create_item.ts              *
  * --------------------------- *
  * Created by Noah Sadir       *
- *         on October 19, 2021 *
+ *         on October 27, 2021 *
  *******************************/
 
 import {
   Credentials,
   QueryError,
-  CreateClassArgs
+  ModifyAssignmentArgs
 } from './interfaces';
 
 import {
   generateUniqueRandomString,
   occurrencesInTable,
-  verifyToken
+  verifyToken,
+  getEditPermissionsForClass
 } from './helper';
 
 /**
@@ -24,9 +25,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function createClass(con: any, req: any, res: any) {
+export function modifyAssignment(con: any, req: any, res: any) {
 
-  var body: CreateClassArgs = req.body;
+  var body: ModifyAssignmentArgs = req.body;
 
   validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -49,10 +50,10 @@ export function createClass(con: any, req: any, res: any) {
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {CreateClassArgs} body the arguments provided by the user
+ * @param {ModifyAssignmentArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: CreateClassArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_name != null) {
+function validateInput(con: any, req: any, res: any, body: ModifyAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null && body.class_id != null && body.category_id != null && body.assignment_id != null) {
 
     verifyToken(con, body.internal_id, body.token, (authStat: number, vtErr: Object) => {
       if (authStat == 1) {
@@ -110,31 +111,30 @@ function validateInput(con: any, req: any, res: any, body: CreateClassArgs, call
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {CreateClassArgs} body the arguments provided by the user
+ * @param {ModifyAssignmentArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: CreateClassArgs, callback: (statusCode: number, output: Object) => void) {
-  //Generate internal ID
-  generateUniqueRandomString(con, 16, "classes", "class_id", (classID: string) => {
-    if (classID != null) {
-      var sql = "INSERT INTO classes (class_id, class_name, class_code, color, weight) VALUES (?, ?, ?, ?, ?)";
-      var args: [string, string, string, number, number] = [classID, body.class_name, body.class_code, body.color, body.weight];
-
-      con.query(sql, args, function (addclaErr: Object, result: Object) {
-        if (!addclaErr) {
-          var editClassSql = "INSERT INTO edit_permissions (internal_id, class_id) VALUES (?, ?)";
-          var editClassArgs: [string, string] = [body.internal_id, classID];
-          con.query(editClassSql, editClassArgs, (addeditErr: Object, result: Object) => {
-            if (!addeditErr) {
+function performAction(con: any, req: any, res: any, body: ModifyAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
+  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+    if (hasPermission && !editErr) {
+      var delSql = "DELETE FROM items WHERE assignment_id = ?";
+      var delArgs: [string] = [body.assignment_id];
+      con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
+        if (!delErr) {
+          var modifyDate = Math.round(Date.now() / 1000);
+          var sql = "INSERT INTO items (class_id, category_id, assignment_id, title, description, grade_id, act_score, max_score, weight, due_date, assign_date, graded_date, penalty, modify_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+          var args: [string, string, string, string, string, string, number, number, number, number, number, number, number, number] = [body.class_id, body.category_id, body.assignment_id, body.title, body.description, body.grade_id, body.act_score, body.max_score, body.weight, body.due_date, body.assign_date, body.graded_date, body.penalty, modifyDate];
+          con.query(sql, args, function (asgErr: Object, result: Object) {
+            if (!asgErr) {
               callback(200, {
                 success: true,
-                class_id: classID
+                message: "Successfully modified assignment."
               });
             } else {
               callback(500, {
                 success: false,
-                error: "DBG_ERR_USER_EDIT",
-                message: "Created list, but unable to give user edit permissions",
-                details: addeditErr
+                error: "DBG_ERR_SQL_QUERY",
+                message: "Unable to perform query.",
+                details: asgErr
               });
             }
           });
@@ -143,15 +143,22 @@ function performAction(con: any, req: any, res: any, body: CreateClassArgs, call
             success: false,
             error: "DBG_ERR_SQL_QUERY",
             message: "Unable to perform query.",
-            details: addclaErr
+            details: delErr
           });
         }
       });
-    } else {
+    } else if (editErr) {
       callback(500, {
         success: false,
-        error: "ERR_RANDSTR_GENERATION",
-        message: "Unable to generate random string for class ID."
+        error: "DBG_ERR_SQL_QUERY",
+        message: "Unable to perform query.",
+        details: editErr
+      });
+    } else {
+      callback(400, {
+        success: false,
+        error: "ERR_EDIT_PERMISSSION",
+        message: "User does not have edit permissions for this class."
       });
     }
   });

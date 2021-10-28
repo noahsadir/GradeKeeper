@@ -15,6 +15,8 @@
 		FF31E3CC271A57950060BFFB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF31E3CA271A57950060BFFB /* LaunchScreen.storyboard */; };
 		FF31E3D7271A57950060BFFB /* GradeKeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF31E3D6271A57950060BFFB /* GradeKeeperTests.swift */; };
 		FF31E3E2271A57950060BFFB /* GradeKeeperUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF31E3E1271A57950060BFFB /* GradeKeeperUITests.swift */; };
+		FFC6855D272A3F8D00CDFE99 /* MainTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */; };
+		FFC6855F272A3FB900CDFE99 /* GradeKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +51,8 @@
 		FF31E3DD271A57950060BFFB /* GradeKeeperUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GradeKeeperUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF31E3E1271A57950060BFFB /* GradeKeeperUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeKeeperUITests.swift; sourceTree = "<group>"; };
 		FF31E3E3271A57950060BFFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewController.swift; sourceTree = "<group>"; };
+		FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeKeeper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -102,7 +106,9 @@
 				FF31E3BF271A57930060BFFB /* AppDelegate.swift */,
 				FF31E3C1271A57930060BFFB /* SceneDelegate.swift */,
 				FF31E3C3271A57930060BFFB /* ViewController.swift */,
+				FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */,
 				FF31E3C5271A57930060BFFB /* Main.storyboard */,
+				FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */,
 				FF31E3C8271A57950060BFFB /* Assets.xcassets */,
 				FF31E3CA271A57950060BFFB /* LaunchScreen.storyboard */,
 				FF31E3CD271A57950060BFFB /* Info.plist */,
@@ -258,6 +264,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFC6855D272A3F8D00CDFE99 /* MainTableViewController.swift in Sources */,
+				FFC6855F272A3FB900CDFE99 /* GradeKeeper.swift in Sources */,
 				FF31E3C4271A57930060BFFB /* ViewController.swift in Sources */,
 				FF31E3C0271A57930060BFFB /* AppDelegate.swift in Sources */,
 				FF31E3C2271A57930060BFFB /* SceneDelegate.swift in Sources */,

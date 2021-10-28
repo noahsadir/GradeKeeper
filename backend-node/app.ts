@@ -26,6 +26,11 @@ import { getLogs } from './get_logs';
 import { getStructure } from './get_structure';
 import { getAssignments } from './get_assignments';
 
+import { modifyClass } from './modify_class';
+import { modifyCategory } from './modify_category';
+import { modifyGrade } from './modify_grade';
+import { modifyAssignment } from './modify_assignment';
+
 var mysql = require('mysql2');
 
 var credentials: Credentials = require('./credentials.json');
@@ -90,6 +95,26 @@ app.post('/create_assignment', (req, res) => {
   createAssignment(con, req, res);
 });
 
+app.post('/modify_class', (req, res) => {
+  logRequest("post", "modify_class", req);
+  modifyClass(con, req, res);
+});
+
+app.post('/modify_category', (req, res) => {
+  logRequest("post", "modify_category", req);
+  modifyCategory(con, req, res);
+});
+
+app.post('/modify_grade', (req, res) => {
+  logRequest("post", "modify_grade", req);
+  modifyGrade(con, req, res);
+});
+
+app.post('/modify_assignment', (req, res) => {
+  logRequest("post", "modify_assignment", req);
+  modifyAssignment(con, req, res);
+});
+
 app.get('*', (req, res) => {
   logRequest("get", "*", req);
   res.statusCode = 405;
@@ -106,7 +131,7 @@ app.post('*', (req, res) => {
   res.json({
     success: false,
     error: "ERR_HTTP",
-    message: "Error 400: Bad Request"
+    message: "Error 400: Bad (unrecognized) Request"
   });
 });
 
