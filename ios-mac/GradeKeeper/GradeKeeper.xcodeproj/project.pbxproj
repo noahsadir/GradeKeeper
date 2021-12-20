@@ -15,6 +15,24 @@
 		FF31E3CC271A57950060BFFB /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = FF31E3CA271A57950060BFFB /* LaunchScreen.storyboard */; };
 		FF31E3D7271A57950060BFFB /* GradeKeeperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF31E3D6271A57950060BFFB /* GradeKeeperTests.swift */; };
 		FF31E3E2271A57950060BFFB /* GradeKeeperUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF31E3E1271A57950060BFFB /* GradeKeeperUITests.swift */; };
+		FF5E6E98272C6141006F895E /* EditAssignmentTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5E6E97272C6141006F895E /* EditAssignmentTableViewController.swift */; };
+		FF5E6E9A27304467006F895E /* SplitViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5E6E9927304467006F895E /* SplitViewController.swift */; };
+		FF5E6E9C27306438006F895E /* SelectCategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5E6E9B27306438006F895E /* SelectCategoryTableViewController.swift */; };
+		FF5E6E9E2731C991006F895E /* CreateCategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5E6E9D2731C991006F895E /* CreateCategoryTableViewController.swift */; };
+		FF5E6EA027363ED9006F895E /* ViewAssignmentTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF5E6E9F27363ED9006F895E /* ViewAssignmentTableViewController.swift */; };
+		FF67D71C272B05BF00E847A2 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF67D71B272B05BF00E847A2 /* LoginViewController.swift */; };
+		FF67D71E272B1A5A00E847A2 /* CourseListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF67D71D272B1A5A00E847A2 /* CourseListTableViewCell.swift */; };
+		FF67D720272B1D1D00E847A2 /* AssignmentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF67D71F272B1D1D00E847A2 /* AssignmentTableViewCell.swift */; };
+		FF67D722272B1F5700E847A2 /* ViewCourseTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF67D721272B1F5700E847A2 /* ViewCourseTableViewController.swift */; };
+		FFC146C0276EE5FD00417299 /* GKStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC146BF276EE5FD00417299 /* GKStructures.swift */; };
+		FFC146C2276EE65000417299 /* GKCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC146C1276EE65000417299 /* GKCalls.swift */; };
+		FFC14703276FEB5900417299 /* CreateCourseTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC14702276FEB5900417299 /* CreateCourseTableViewController.swift */; };
+		FFC14705277033B500417299 /* EditGradeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC14704277033B500417299 /* EditGradeTableViewController.swift */; };
+		FFC14707277033BE00417299 /* EditCategoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC14706277033BE00417299 /* EditCategoryTableViewController.swift */; };
+		FFC14709277033EF00417299 /* ViewCategoriesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC14708277033EF00417299 /* ViewCategoriesTableViewController.swift */; };
+		FFC1470B2770340000417299 /* ViewGradeScaleTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1470A2770340000417299 /* ViewGradeScaleTableViewController.swift */; };
+		FFC1470D2770342800417299 /* GradeScaleTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1470C2770342800417299 /* GradeScaleTableViewCell.swift */; };
+		FFC1470F2770455800417299 /* ViewCourseDetailsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1470E2770455800417299 /* ViewCourseDetailsTableViewController.swift */; };
 		FFC6855D272A3F8D00CDFE99 /* MainTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */; };
 		FFC6855F272A3FB900CDFE99 /* GradeKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */; };
 /* End PBXBuildFile section */
@@ -51,6 +69,25 @@
 		FF31E3DD271A57950060BFFB /* GradeKeeperUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GradeKeeperUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF31E3E1271A57950060BFFB /* GradeKeeperUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeKeeperUITests.swift; sourceTree = "<group>"; };
 		FF31E3E3271A57950060BFFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FF5E6E94272C501B006F895E /* GradeKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GradeKeeper.entitlements; sourceTree = "<group>"; };
+		FF5E6E97272C6141006F895E /* EditAssignmentTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditAssignmentTableViewController.swift; sourceTree = "<group>"; };
+		FF5E6E9927304467006F895E /* SplitViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplitViewController.swift; sourceTree = "<group>"; };
+		FF5E6E9B27306438006F895E /* SelectCategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectCategoryTableViewController.swift; sourceTree = "<group>"; };
+		FF5E6E9D2731C991006F895E /* CreateCategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCategoryTableViewController.swift; sourceTree = "<group>"; };
+		FF5E6E9F27363ED9006F895E /* ViewAssignmentTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewAssignmentTableViewController.swift; sourceTree = "<group>"; };
+		FF67D71B272B05BF00E847A2 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		FF67D71D272B1A5A00E847A2 /* CourseListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseListTableViewCell.swift; sourceTree = "<group>"; };
+		FF67D71F272B1D1D00E847A2 /* AssignmentTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssignmentTableViewCell.swift; sourceTree = "<group>"; };
+		FF67D721272B1F5700E847A2 /* ViewCourseTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCourseTableViewController.swift; sourceTree = "<group>"; };
+		FFC146BF276EE5FD00417299 /* GKStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GKStructures.swift; sourceTree = "<group>"; };
+		FFC146C1276EE65000417299 /* GKCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GKCalls.swift; sourceTree = "<group>"; };
+		FFC14702276FEB5900417299 /* CreateCourseTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCourseTableViewController.swift; sourceTree = "<group>"; };
+		FFC14704277033B500417299 /* EditGradeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditGradeTableViewController.swift; sourceTree = "<group>"; };
+		FFC14706277033BE00417299 /* EditCategoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditCategoryTableViewController.swift; sourceTree = "<group>"; };
+		FFC14708277033EF00417299 /* ViewCategoriesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCategoriesTableViewController.swift; sourceTree = "<group>"; };
+		FFC1470A2770340000417299 /* ViewGradeScaleTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewGradeScaleTableViewController.swift; sourceTree = "<group>"; };
+		FFC1470C2770342800417299 /* GradeScaleTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeScaleTableViewCell.swift; sourceTree = "<group>"; };
+		FFC1470E2770455800417299 /* ViewCourseDetailsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCourseDetailsTableViewController.swift; sourceTree = "<group>"; };
 		FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewController.swift; sourceTree = "<group>"; };
 		FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeKeeper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -103,12 +140,14 @@
 		FF31E3BE271A57930060BFFB /* GradeKeeper */ = {
 			isa = PBXGroup;
 			children = (
+				FF5E6E94272C501B006F895E /* GradeKeeper.entitlements */,
 				FF31E3BF271A57930060BFFB /* AppDelegate.swift */,
 				FF31E3C1271A57930060BFFB /* SceneDelegate.swift */,
 				FF31E3C3271A57930060BFFB /* ViewController.swift */,
-				FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */,
 				FF31E3C5271A57930060BFFB /* Main.storyboard */,
-				FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */,
+				FF67D724272B8C8300E847A2 /* Library */,
+				FF67D725272B8C8F00E847A2 /* Table Cells */,
+				FF67D723272B8C5F00E847A2 /* View Controllers */,
 				FF31E3C8271A57950060BFFB /* Assets.xcassets */,
 				FF31E3CA271A57950060BFFB /* LaunchScreen.storyboard */,
 				FF31E3CD271A57950060BFFB /* Info.plist */,
@@ -132,6 +171,47 @@
 				FF31E3E3271A57950060BFFB /* Info.plist */,
 			);
 			path = GradeKeeperUITests;
+			sourceTree = "<group>";
+		};
+		FF67D723272B8C5F00E847A2 /* View Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				FF5E6E9927304467006F895E /* SplitViewController.swift */,
+				FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */,
+				FF67D71B272B05BF00E847A2 /* LoginViewController.swift */,
+				FFC14702276FEB5900417299 /* CreateCourseTableViewController.swift */,
+				FF5E6E9D2731C991006F895E /* CreateCategoryTableViewController.swift */,
+				FF5E6E97272C6141006F895E /* EditAssignmentTableViewController.swift */,
+				FFC14704277033B500417299 /* EditGradeTableViewController.swift */,
+				FFC14706277033BE00417299 /* EditCategoryTableViewController.swift */,
+				FFC14708277033EF00417299 /* ViewCategoriesTableViewController.swift */,
+				FFC1470A2770340000417299 /* ViewGradeScaleTableViewController.swift */,
+				FF5E6E9F27363ED9006F895E /* ViewAssignmentTableViewController.swift */,
+				FF67D721272B1F5700E847A2 /* ViewCourseTableViewController.swift */,
+				FFC1470E2770455800417299 /* ViewCourseDetailsTableViewController.swift */,
+				FF5E6E9B27306438006F895E /* SelectCategoryTableViewController.swift */,
+			);
+			path = "View Controllers";
+			sourceTree = "<group>";
+		};
+		FF67D724272B8C8300E847A2 /* Library */ = {
+			isa = PBXGroup;
+			children = (
+				FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */,
+				FFC146C1276EE65000417299 /* GKCalls.swift */,
+				FFC146BF276EE5FD00417299 /* GKStructures.swift */,
+			);
+			path = Library;
+			sourceTree = "<group>";
+		};
+		FF67D725272B8C8F00E847A2 /* Table Cells */ = {
+			isa = PBXGroup;
+			children = (
+				FF67D71D272B1A5A00E847A2 /* CourseListTableViewCell.swift */,
+				FF67D71F272B1D1D00E847A2 /* AssignmentTableViewCell.swift */,
+				FFC1470C2770342800417299 /* GradeScaleTableViewCell.swift */,
+			);
+			path = "Table Cells";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -201,6 +281,7 @@
 				TargetAttributes = {
 					FF31E3BB271A57930060BFFB = {
 						CreatedOnToolsVersion = 12.5.1;
+						LastSwiftMigration = 1320;
 					};
 					FF31E3D1271A57950060BFFB = {
 						CreatedOnToolsVersion = 12.5.1;
@@ -264,11 +345,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF5E6E98272C6141006F895E /* EditAssignmentTableViewController.swift in Sources */,
+				FFC14707277033BE00417299 /* EditCategoryTableViewController.swift in Sources */,
+				FF5E6E9E2731C991006F895E /* CreateCategoryTableViewController.swift in Sources */,
+				FF67D71C272B05BF00E847A2 /* LoginViewController.swift in Sources */,
+				FFC14703276FEB5900417299 /* CreateCourseTableViewController.swift in Sources */,
+				FFC146C0276EE5FD00417299 /* GKStructures.swift in Sources */,
+				FFC146C2276EE65000417299 /* GKCalls.swift in Sources */,
+				FF5E6E9A27304467006F895E /* SplitViewController.swift in Sources */,
 				FFC6855D272A3F8D00CDFE99 /* MainTableViewController.swift in Sources */,
+				FF5E6EA027363ED9006F895E /* ViewAssignmentTableViewController.swift in Sources */,
+				FF67D71E272B1A5A00E847A2 /* CourseListTableViewCell.swift in Sources */,
 				FFC6855F272A3FB900CDFE99 /* GradeKeeper.swift in Sources */,
+				FF67D720272B1D1D00E847A2 /* AssignmentTableViewCell.swift in Sources */,
 				FF31E3C4271A57930060BFFB /* ViewController.swift in Sources */,
+				FFC1470D2770342800417299 /* GradeScaleTableViewCell.swift in Sources */,
 				FF31E3C0271A57930060BFFB /* AppDelegate.swift in Sources */,
+				FF67D722272B1F5700E847A2 /* ViewCourseTableViewController.swift in Sources */,
+				FFC14705277033B500417299 /* EditGradeTableViewController.swift in Sources */,
+				FFC1470F2770455800417299 /* ViewCourseDetailsTableViewController.swift in Sources */,
 				FF31E3C2271A57930060BFFB /* SceneDelegate.swift in Sources */,
+				FFC14709277033EF00417299 /* ViewCategoriesTableViewController.swift in Sources */,
+				FFC1470B2770340000417299 /* ViewGradeScaleTableViewController.swift in Sources */,
+				FF5E6E9C27306438006F895E /* SelectCategoryTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -444,17 +543,23 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = GradeKeeper/GradeKeeper.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y7NL9XLUR5;
 				INFOPLIST_FILE = GradeKeeper/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.noahsadir.GradeKeeper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Debug;
 		};
@@ -463,17 +568,22 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = GradeKeeper/GradeKeeper.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y7NL9XLUR5;
 				INFOPLIST_FILE = GradeKeeper/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.noahsadir.GradeKeeper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Release;
 		};

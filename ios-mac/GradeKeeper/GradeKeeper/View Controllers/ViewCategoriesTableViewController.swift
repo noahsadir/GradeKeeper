@@ -1,13 +1,13 @@
 //
-//  MainTableViewController.swift
+//  ViewCategoriesTableViewController.swift
 //  GradeKeeper
 //
-//  Created by Noah Sadir on 10/27/21.
+//  Created by Noah Sadir on 12/19/21.
 //
 
 import UIKit
 
-class MainTableViewController: UITableViewController {
+class ViewCategoriesTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
