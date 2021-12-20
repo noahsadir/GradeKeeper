@@ -31,6 +31,9 @@ import { modifyCategory } from './modify_category';
 import { modifyGrade } from './modify_grade';
 import { modifyAssignment } from './modify_assignment';
 
+import { deleteAssignment } from './delete_assignment';
+import { deleteCategory } from './delete_category';
+
 var mysql = require('mysql2');
 
 var credentials: Credentials = require('./credentials.json');
@@ -113,6 +116,16 @@ app.post('/modify_grade', (req, res) => {
 app.post('/modify_assignment', (req, res) => {
   logRequest("post", "modify_assignment", req);
   modifyAssignment(con, req, res);
+});
+
+app.post('/delete_assignment', (req, res) => {
+  logRequest("post", "delete_assignment", req);
+  deleteAssignment(con, req, res);
+});
+
+app.post('/delete_category', (req, res) => {
+  logRequest("post", "delete_category", req);
+  deleteCategory(con, req, res);
 });
 
 app.get('*', (req, res) => {

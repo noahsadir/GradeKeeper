@@ -72,6 +72,20 @@ export interface CreateAssignmentArgs {
   modify_date: number;
 }
 
+export interface DeleteAssignmentArgs {
+  internal_id: string;
+  token: string;
+  class_id: string;
+  assignment_id: string;
+}
+
+export interface DeleteCategoryArgs {
+  internal_id: string;
+  token: string;
+  class_id: string;
+  category_id: string;
+}
+
 export interface ModifyClassArgs {
   internal_id: string; // required
   token: string; // required

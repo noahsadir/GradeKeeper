@@ -1,5 +1,5 @@
 /*******************************
- * modify_class.ts             *
+ * create_user.ts              *
  * --------------------------- *
  * Created by Noah Sadir       *
  *         on October 19, 2021 *
@@ -8,13 +8,16 @@
 import {
   Credentials,
   QueryError,
-  CreateClassArgs
+  GetClassesArgs,
+  Gradebook
 } from './interfaces';
 
 import {
-  generateUniqueRandomString,
+  generateRandomString,
   occurrencesInTable,
-  verifyToken
+  verifyToken,
+  selectAllFromWhere,
+  numberFromSqlDec
 } from './helper';
 
 /**
@@ -24,9 +27,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function createClass(con: any, req: any, res: any) {
+export function getClasses(con: any, req: any, res: any) {
 
-  var body: CreateClassArgs = req.body;
+  var body: GetClassesArgs = req.body;
 
   validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -39,7 +42,6 @@ export function createClass(con: any, req: any, res: any) {
       res.json(viOutput);
     }
   });
-
 }
 
 /**
@@ -49,10 +51,10 @@ export function createClass(con: any, req: any, res: any) {
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {CreateClassArgs} body the arguments provided by the user
+ * @param {GetClassesArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: CreateClassArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_name != null) {
+function validateInput(con: any, req: any, res: any, body: GetClassesArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null) {
 
     verifyToken(con, body.internal_id, body.token, (authStat: number, vtErr: Object) => {
       if (authStat == 1) {
@@ -110,49 +112,101 @@ function validateInput(con: any, req: any, res: any, body: CreateClassArgs, call
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {CreateClassArgs} body the arguments provided by the user
+ * @param {GetClassesArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: CreateClassArgs, callback: (statusCode: number, output: Object) => void) {
-  //Generate internal ID
-  generateUniqueRandomString(con, 16, "classes", "class_id", (classID: string) => {
-    if (classID != null) {
-      var sql = "INSERT INTO classes (class_id, class_name, class_code, color, weight) VALUES (?, ?, ?, ?, ?)";
-      var args: [string, string, string, number, number] = [classID, body.class_name, body.class_code, body.color, body.weight];
+function performAction(con: any, req: any, res: any, body: GetClassesArgs, callback: (statusCode: number, output: Object) => void) {
+  var gradebook: Gradebook = {classes: {}};
+  selectAllFromWhere(con, "class_id","edit_permissions","internal_id", body.internal_id, (result: any[], err: QueryError) => {
+    var classIDs: string[] = [];
+    for (var i in result) {
+      classIDs.push(result[i].class_id);
+    }
+    getClassDataSequentially(con, classIDs, 0, gradebook, (newGradebook: Gradebook, gcdsErr: QueryError) => {
+      if (!gcdsErr) {
+        callback(200, {
+          success: true,
+          gradebook: newGradebook
+        })
+      } else {
+        callback(500, {
+          success: false,
+          error: "DBG_ERR_SQL_QUERY",
+          message: "Unable to perform query.",
+          details: gcdsErr
+        });
+      }
+    });
+  });
+}
 
-      con.query(sql, args, function (addclaErr: Object, result: Object) {
-        if (!addclaErr) {
-          var editClassSql = "INSERT INTO edit_permissions (internal_id, class_id) VALUES (?, ?)";
-          var editClassArgs: [string, string] = [body.internal_id, classID];
-          con.query(editClassSql, editClassArgs, (addeditErr: Object, result: Object) => {
-            if (!addeditErr) {
-              callback(200, {
-                success: true,
-                class_id: classID
-              });
+//Asynchronous Recursion... isn't that fun?
+function getClassDataSequentially(con: any, classIDs: string[], index: number, gradebook: Gradebook, callback: (newGradebook: Gradebook, err: QueryError) => void) {
+  var sql = "SELECT `class_name`, `class_code`, `color`, `weight` FROM `classes` WHERE `class_id` = ?";
+  var args: [string] = [classIDs[index]];
+  con.query(sql, args, (err: QueryError, result: any[], fields: Object) => {
+    if (!err) {
+      var catSql = "SELECT `category_id`, `category_name`, `drop_count`, `weight` FROM `categories` WHERE `class_id` = ?";
+      con.query(catSql, args, (catErr: QueryError, catRes: any[], catFields: Object) => {
+        var grdSql = "SELECT `grade_id`, `min_score`, `max_score`, `credit` FROM `grade_scales` WHERE `class_id` = ?";
+        con.query(grdSql, args, (grdErr: QueryError, grdRes: any[], grdFields: Object) => {
+          var asgSql = "SELECT `assignment_id`, `category_id` FROM `items` WHERE `class_id` = ?";
+          con.query(asgSql, args, (asgErr: QueryError, asgRes: any[], asgFields: Object) => {
+            if (!catErr && !grdErr && !asgErr && result.length == 1) {
+              gradebook.classes[classIDs[index]] = {
+                name: result[0].class_name,
+                code: result[0].class_code,
+                color: result[0].color,
+                weight: numberFromSqlDec(result[0].weight),
+                grade_scale: {},
+                categories: {}
+              };
+
+              for (var i in catRes) {
+                gradebook.classes[classIDs[index]].categories[catRes[i].category_id] = {
+                  category_name: catRes[i].category_name,
+                  drop_count: catRes[i].drop_count,
+                  weight: numberFromSqlDec(catRes[i].weight),
+                  assignments: []
+                };
+              }
+
+              for (var i in grdRes) {
+                gradebook.classes[classIDs[index]].grade_scale[grdRes[i].grade_id] = {
+                  min_score: numberFromSqlDec(grdRes[i].min_score),
+                  max_score: numberFromSqlDec(grdRes[i].max_score),
+                  credit: numberFromSqlDec(grdRes[i].credit)
+                };
+              }
+
+              for (var i in asgRes) {
+                if (gradebook.classes[classIDs[index]].categories[asgRes[i].category_id] != null) {
+                  gradebook.classes[classIDs[index]].categories[asgRes[i].category_id].assignments.push(asgRes[i].assignment_id);
+                }
+              }
+
+              if (index == classIDs.length) {
+                callback(gradebook, err);
+              } else {
+                getClassDataSequentially(con, classIDs, index + 1, gradebook, (recGB: Gradebook, recErr: QueryError) => {
+                  callback(recGB, recErr);
+                });
+              }
             } else {
-              callback(500, {
-                success: false,
-                error: "DBG_ERR_USER_EDIT",
-                message: "Created list, but unable to give user edit permissions",
-                details: addeditErr
-              });
+              if (catErr) {
+                callback(gradebook, catErr);
+              } else if (grdErr) {
+                callback(gradebook, grdErr);
+              } else if (asgErr) {
+                callback(gradebook, grdErr);
+              } else {
+                callback(gradebook, null);
+              }
             }
           });
-        } else {
-          callback(500, {
-            success: false,
-            error: "DBG_ERR_SQL_QUERY",
-            message: "Unable to perform query.",
-            details: addclaErr
-          });
-        }
+        });
       });
     } else {
-      callback(500, {
-        success: false,
-        error: "ERR_RANDSTR_GENERATION",
-        message: "Unable to generate random string for class ID."
-      });
+      callback(gradebook, err);
     }
   });
 }

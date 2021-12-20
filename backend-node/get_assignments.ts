@@ -120,7 +120,6 @@ function performAction(con: any, req: any, res: any, body: GetAssignmentsArgs, c
       for (var i in res) {
         if (body.ignore_before_date == null || res[i].modify_date >= body.ignore_before_date) {
           assignments[res[i].assignment_id] = {
-            category_id: res[i].category_id,
             title: res[i].title,
             description: res[i].description,
             grade_id: res[i].grade_id,
