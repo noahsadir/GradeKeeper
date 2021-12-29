@@ -33,6 +33,8 @@ import { modifyAssignment } from './modify_assignment';
 
 import { deleteAssignment } from './delete_assignment';
 import { deleteCategory } from './delete_category';
+import { deleteGrade } from './delete_grade';
+import { deleteClass } from './delete_class';
 
 var mysql = require('mysql2');
 
@@ -126,6 +128,16 @@ app.post('/delete_assignment', (req, res) => {
 app.post('/delete_category', (req, res) => {
   logRequest("post", "delete_category", req);
   deleteCategory(con, req, res);
+});
+
+app.post('/delete_class', (req, res) => {
+  logRequest("post", "delete_class", req);
+  deleteClass(con, req, res);
+});
+
+app.post('/delete_grade', (req, res) => {
+  logRequest("post", "delete_grade", req);
+  deleteGrade(con, req, res);
 });
 
 app.get('*', (req, res) => {

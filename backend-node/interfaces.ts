@@ -13,7 +13,6 @@ export interface QueryError {
 }
 
 /* API Arguments */
-
 export interface CreateUserArgs {
   api_key: string; // required
   email: string; // required
@@ -86,6 +85,19 @@ export interface DeleteCategoryArgs {
   category_id: string;
 }
 
+export interface DeleteGradeArgs {
+  internal_id: string;
+  token: string;
+  class_id: string;
+  grade_id: string;
+}
+
+export interface DeleteClassArgs {
+  internal_id: string;
+  token: string;
+  class_id: string;
+}
+
 export interface ModifyClassArgs {
   internal_id: string; // required
   token: string; // required
@@ -100,7 +112,7 @@ export interface ModifyCategoryArgs {
   internal_id: string; // required
   token: string; // required
   class_id: string; // required
-  category_id: string;
+  category_id: string; // required
   category_name: string; //required
   drop_count: number;
   weight: number;

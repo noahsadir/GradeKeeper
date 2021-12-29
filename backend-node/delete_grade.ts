@@ -8,7 +8,7 @@
 import {
   Credentials,
   QueryError,
-  DeleteCategoryArgs
+  DeleteGradeArgs
 } from './interfaces';
 
 import {
@@ -25,9 +25,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function deleteCategory(con: any, req: any, res: any) {
+export function deleteGrade(con: any, req: any, res: any) {
 
-  var body: DeleteCategoryArgs = req.body;
+  var body: DeleteGradeArgs = req.body;
 
   validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -52,8 +52,8 @@ export function deleteCategory(con: any, req: any, res: any) {
  * @param {any} res the Express result
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: DeleteCategoryArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.category_id != null && body.class_id != null) {
+function validateInput(con: any, req: any, res: any, body: DeleteGradeArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null && body.grade_id != null && body.class_id != null) {
 
     verifyToken(con, body.internal_id, body.token, (authStat: number, vtErr: Object) => {
       if (authStat == 1) {
@@ -104,6 +104,7 @@ function validateInput(con: any, req: any, res: any, body: DeleteCategoryArgs, c
   }
 }
 
+
 /**
  * Perform action after validating user input.
  * Errors here should typically return HTTP code 500.
@@ -113,33 +114,22 @@ function validateInput(con: any, req: any, res: any, body: DeleteCategoryArgs, c
  * @param {any} res the Express result
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: DeleteCategoryArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, req: any, res: any, body: DeleteGradeArgs, callback: (statusCode: number, output: Object) => void) {
   getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
-      var delSql = "DELETE FROM categories WHERE category_id = ?";
-      var delArgs: [string] = [body.category_id];
+      var delSql = "DELETE FROM grade_scales WHERE grade_id = ?";
+      var delArgs: [string] = [body.grade_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
         if (!delErr) {
-          deleteAssignmentsInCategory(body.category_id, (delAsgErr: Object) => {
-            if (!delAsgErr) {
-              callback(200, {
-                success: true,
-                message: "Successfully deleted category and its assignments."
-              });
-            } else {
-              callback(500, {
-                success: false,
-                error: "DBG_ERR_SQL_QUERY",
-                message: "Unable to perform query while deleting assignments in category.",
-                details: delAsgErr
-              });
-            }
+          callback(200, {
+            success: true,
+            message: "Successfully deleted grade."
           });
         } else {
           callback(500, {
             success: false,
             error: "DBG_ERR_SQL_QUERY",
-            message: "Unable to perform query while deleting category.",
+            message: "Unable to perform query.",
             details: delErr
           });
         }
@@ -158,13 +148,5 @@ function performAction(con: any, req: any, res: any, body: DeleteCategoryArgs, c
         message: "User does not have edit permissions for this class."
       });
     }
-  });
-}
-
-function deleteAssignmentsInCategory(catID: string, callback: (error: Object) => void) {
-  var delSql = "DELETE FROM assignments WHERE category_id = ?";
-  var delArgs: [string] = [body.category_id];
-  con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
-    callback(delErr);
   });
 }
