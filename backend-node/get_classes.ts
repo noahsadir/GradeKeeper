@@ -141,7 +141,7 @@ function performAction(con: any, req: any, res: any, body: GetClassesArgs, callb
 
 //Asynchronous Recursion... isn't that fun?
 function getClassDataSequentially(con: any, classIDs: string[], index: number, gradebook: Gradebook, callback: (newGradebook: Gradebook, err: QueryError) => void) {
-  var sql = "SELECT `class_name`, `class_code`, `color`, `weight` FROM `classes` WHERE `class_id` = ?";
+  var sql = "SELECT `class_name`, `class_code`, `color`, `weight`, `instructor` FROM `classes` WHERE `class_id` = ?";
   var args: [string] = [classIDs[index]];
   con.query(sql, args, (err: QueryError, result: any[], fields: Object) => {
     if (!err) {
@@ -157,6 +157,7 @@ function getClassDataSequentially(con: any, classIDs: string[], index: number, g
                 code: result[0].class_code,
                 color: result[0].color,
                 weight: numberFromSqlDec(result[0].weight),
+                instructor: result[0].instructor,
                 grade_scale: {},
                 categories: {}
               };

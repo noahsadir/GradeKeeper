@@ -32,6 +32,8 @@ export interface CreateClassArgs {
   class_code: string;
   color: number;
   weight: number;
+  instructor: string;
+  term_id: string;
 }
 
 export interface CreateCategoryArgs {
@@ -41,6 +43,14 @@ export interface CreateCategoryArgs {
   category_name: string; //required
   drop_count: number;
   weight: number;
+}
+
+export interface CreateTermArgs {
+  internal_id: string; // required
+  token: string; // required
+  term_title: string; // required
+  start_date: number;
+  end_date: number;
 }
 
 export interface CreateGradeArgs {
@@ -106,6 +116,8 @@ export interface ModifyClassArgs {
   class_code: string;
   color: number;
   weight: number;
+  instructor: string;
+  term_id: string;
 }
 
 export interface ModifyCategoryArgs {
@@ -117,6 +129,16 @@ export interface ModifyCategoryArgs {
   drop_count: number;
   weight: number;
 }
+
+export interface ModifyTermArgs {
+  internal_id: string; // required
+  token: string; // required
+  term_id: string; // required
+  term_title: string; // required
+  start_date: number;
+  end_date: number;
+}
+
 
 export interface ModifyGradeArgs {
   internal_id: string; // required
@@ -162,6 +184,11 @@ export interface GetAssignmentsArgs {
   token: string; // required
   class_id: string; // required
   ignore_before_date: number;
+}
+
+export interface GetTermsArgs {
+  internal_id: string;
+  token: string;
 }
 
 export interface GetLogsArgs {

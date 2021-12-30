@@ -8,7 +8,7 @@
 import {
   Credentials,
   QueryError,
-  ModifyClassArgs
+  ModifyTermArgs
 } from './interfaces';
 
 import {
@@ -25,9 +25,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function modifyClass(con: any, req: any, res: any) {
+export function modifyTerm(con: any, req: any, res: any) {
 
-  var body: ModifyClassArgs = req.body;
+  var body: ModifyTermArgs = req.body;
 
   validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -50,10 +50,10 @@ export function modifyClass(con: any, req: any, res: any) {
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {ModifyClassArgs} body the arguments provided by the user
+ * @param {ModifyTermArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: ModifyClassArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.class_name != null) {
+function validateInput(con: any, req: any, res: any, body: ModifyTermArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null && body.term_id != null && body.term_title != null) {
 
     verifyToken(con, body.internal_id, body.token, (authStat: number, vtErr: Object) => {
       if (authStat == 1) {
@@ -111,55 +111,24 @@ function validateInput(con: any, req: any, res: any, body: ModifyClassArgs, call
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {ModifyClassArgs} body the arguments provided by the user
+ * @param {ModifyTermArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: ModifyClassArgs, callback: (statusCode: number, output: Object) => void) {
-  //Generate internal ID
+function performAction(con: any, req: any, res: any, body: ModifyTermArgs, callback: (statusCode: number, output: Object) => void) {
+  var sql = "UPDATE terms SET (title = ?, start_date = ?, end_date = ?) WHERE (internal_id = ? AND term_id = ?)";
+  var args: [string, number, number, string, string] = [body.term_title, body.start_date, body.end_date, body.internal_id, body.term_id];
 
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
-    if (hasPermission && !editErr) {
-      var delSql = "DELETE FROM classes WHERE class_id = ?";
-      var delArgs: [string] = [body.class_id];
-      con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
-        if (!delErr) {
-          var sql = "INSERT INTO classes (class_id, class_name, class_code, color, weight, instructor, term_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-          var args: [string, string, string, number, number, string, string] = [body.class_id, body.class_name, body.class_code, body.color, body.weight, body.instructor, body.term_id];
-          con.query(sql, args, function (addclaErr: Object, result: Object) {
-            if (!addclaErr) {
-              callback(200, {
-                success: true,
-                message: "Successfully modified class."
-              });
-            } else {
-              callback(500, {
-                success: false,
-                error: "DBG_ERR_SQL_QUERY",
-                message: "Unable to perform query.",
-                details: addclaErr
-              });
-            }
-          });
-        } else {
-          callback(500, {
-            success: false,
-            error: "DBG_ERR_SQL_QUERY",
-            message: "Unable to perform query.",
-            details: delErr
-          });
-        }
+  con.query(sql, args, function (trmErr: Object, result: Object) {
+    if (!trmErr) {
+      callback(200, {
+        success: true,
+        message: "Successfully modified category in class."
       });
-    } else if (editErr) {
+    } else {
       callback(500, {
         success: false,
         error: "DBG_ERR_SQL_QUERY",
         message: "Unable to perform query.",
-        details: editErr
-      });
-    } else {
-      callback(400, {
-        success: false,
-        error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        details: trmErr
       });
     }
   });

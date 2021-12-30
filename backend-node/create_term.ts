@@ -1,5 +1,5 @@
 /*******************************
- * create_user.ts              *
+ * create_term.ts              *
  * --------------------------- *
  * Created by Noah Sadir       *
  *         on October 19, 2021 *
@@ -8,7 +8,7 @@
 import {
   Credentials,
   QueryError,
-  ModifyClassArgs
+  CreateTermArgs
 } from './interfaces';
 
 import {
@@ -25,9 +25,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function modifyClass(con: any, req: any, res: any) {
+export function createTerm(con: any, req: any, res: any) {
 
-  var body: ModifyClassArgs = req.body;
+  var body: CreateTermArgs = req.body;
 
   validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -50,10 +50,10 @@ export function modifyClass(con: any, req: any, res: any) {
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {ModifyClassArgs} body the arguments provided by the user
+ * @param {CreateTermArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: ModifyClassArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.class_name != null) {
+function validateInput(con: any, req: any, res: any, body: CreateTermArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null && body.term_title != null) {
 
     verifyToken(con, body.internal_id, body.token, (authStat: number, vtErr: Object) => {
       if (authStat == 1) {
@@ -111,55 +111,35 @@ function validateInput(con: any, req: any, res: any, body: ModifyClassArgs, call
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {ModifyClassArgs} body the arguments provided by the user
+ * @param {CreateTermArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: ModifyClassArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, req: any, res: any, body: CreateTermArgs, callback: (statusCode: number, output: Object) => void) {
   //Generate internal ID
+  generateUniqueRandomString(con, 16, "terms", "term_id", (termID: string) => {
+    if (termID != null) {
+      var sql = "INSERT INTO terms (internal_id, term_id, title, start_date, end_date) VALUES (?, ?, ?, ?, ?)";
+      var args: [string, string, string, number, number] = [body.internal_id, termID, body.term_title, body.start_date, body.end_date];
 
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
-    if (hasPermission && !editErr) {
-      var delSql = "DELETE FROM classes WHERE class_id = ?";
-      var delArgs: [string] = [body.class_id];
-      con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
-        if (!delErr) {
-          var sql = "INSERT INTO classes (class_id, class_name, class_code, color, weight, instructor, term_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-          var args: [string, string, string, number, number, string, string] = [body.class_id, body.class_name, body.class_code, body.color, body.weight, body.instructor, body.term_id];
-          con.query(sql, args, function (addclaErr: Object, result: Object) {
-            if (!addclaErr) {
-              callback(200, {
-                success: true,
-                message: "Successfully modified class."
-              });
-            } else {
-              callback(500, {
-                success: false,
-                error: "DBG_ERR_SQL_QUERY",
-                message: "Unable to perform query.",
-                details: addclaErr
-              });
-            }
+      con.query(sql, args, function (addtrmErr: Object, result: Object) {
+        if (!addtrmErr) {
+          callback(200, {
+            success: true,
+            message: "Successfully added term."
           });
         } else {
           callback(500, {
             success: false,
             error: "DBG_ERR_SQL_QUERY",
             message: "Unable to perform query.",
-            details: delErr
+            details: addtrmErr
           });
         }
       });
-    } else if (editErr) {
+    } else {
       callback(500, {
         success: false,
-        error: "DBG_ERR_SQL_QUERY",
-        message: "Unable to perform query.",
-        details: editErr
-      });
-    } else {
-      callback(400, {
-        success: false,
-        error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        error: "ERR_RANDSTR_GENERATION",
+        message: "Unable to generate random string for term ID."
       });
     }
   });

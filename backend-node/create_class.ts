@@ -116,8 +116,8 @@ function performAction(con: any, req: any, res: any, body: CreateClassArgs, call
   //Generate internal ID
   generateUniqueRandomString(con, 16, "classes", "class_id", (classID: string) => {
     if (classID != null) {
-      var sql = "INSERT INTO classes (class_id, class_name, class_code, color, weight) VALUES (?, ?, ?, ?, ?)";
-      var args: [string, string, string, number, number] = [classID, body.class_name, body.class_code, body.color, body.weight];
+      var sql = "INSERT INTO classes (class_id, class_name, class_code, color, weight, instructor, term_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+      var args: [string, string, string, number, number, string, string] = [classID, body.class_name, body.class_code, body.color, body.weight, body.instructor, body.term_id];
 
       con.query(sql, args, function (addclaErr: Object, result: Object) {
         if (!addclaErr) {

@@ -20,16 +20,19 @@ import { createClass } from './create_class';
 import { createCategory } from './create_category';
 import { createGrade } from './create_grade';
 import { createAssignment } from './create_assignment';
+import { createTerm} from './create_term';
 
 import { getClasses } from './get_classes';
 import { getLogs } from './get_logs';
 import { getStructure } from './get_structure';
 import { getAssignments } from './get_assignments';
+import { getTerms } from './get_terms';
 
 import { modifyClass } from './modify_class';
 import { modifyCategory } from './modify_category';
 import { modifyGrade } from './modify_grade';
 import { modifyAssignment } from './modify_assignment';
+import { modifyTerm } from './modify_term';
 
 import { deleteAssignment } from './delete_assignment';
 import { deleteCategory } from './delete_category';
@@ -80,6 +83,11 @@ app.post('/get_logs', (req, res) => {
   getLogs(con, req, res);
 });
 
+app.post('/get_terms', (req, res) => {
+  logRequest("post", "get_terms", req);
+  getTerms(con, req, res);
+});
+
 app.post('/get_assignments', (req, res) => {
   logRequest("post", "get_assignments", req);
   getAssignments(con, req, res);
@@ -100,6 +108,11 @@ app.post('/create_assignment', (req, res) => {
   createAssignment(con, req, res);
 });
 
+app.post('/create_term', (req, res) => {
+  logRequest("post", "create_term", req);
+  createTerm(con, req, res);
+});
+
 app.post('/modify_class', (req, res) => {
   logRequest("post", "modify_class", req);
   modifyClass(con, req, res);
@@ -118,6 +131,11 @@ app.post('/modify_grade', (req, res) => {
 app.post('/modify_assignment', (req, res) => {
   logRequest("post", "modify_assignment", req);
   modifyAssignment(con, req, res);
+});
+
+app.post('/modify_term', (req, res) => {
+  logRequest("post", "modify_term", req);
+  modifyTerm(con, req, res);
 });
 
 app.post('/delete_assignment', (req, res) => {
