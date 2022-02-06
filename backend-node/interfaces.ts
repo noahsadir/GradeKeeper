@@ -108,6 +108,12 @@ export interface DeleteClassArgs {
   class_id: string;
 }
 
+export interface DeleteTermArgs {
+  internal_id: string;
+  token: string;
+  term_id: string;
+}
+
 export interface ModifyClassArgs {
   internal_id: string; // required
   token: string; // required
