@@ -49,7 +49,7 @@ Applications which implement this API should call `user_authenticate` *once* to 
 
 A `500: ERR_TOKEN_VERIFY` error may also be encountered. This likely indicates a serious server-side issue and cannot be handled by the client.
 
-## API Calls
+## User Calls
 
 ### create_user
 
@@ -119,9 +119,11 @@ Authenticate a user with the specified credentials.
 - `ERR_MULTIPLE_EMAILS`: Multiple accounts exist with the same email.
 - `ERR_TOKEN_COUNT`: Abnormal token count (Not 1 or 0).
 
+## Course Calls
+
 ### create_class
 
-Authenticate a user with the specified credentials.
+Create a new course.
 
 #### Accepts
 ```
@@ -139,26 +141,13 @@ Authenticate a user with the specified credentials.
 ```
 {
   "success": true (boolean),
-  "gradebook": {
-    "classes": {
-      "[CLASS_ID]": {
-        "name": string,
-        "code": string,
-        "color": number,
-        "weight": number,
-        "grade_scale": {},
-        "categories": {}
-      },
-      ...
-    }
+  "class_id": string
   }
 }
 ```
 
 #### 400 Errors
 - `ERR_MISSING_ARGS`: The request is missing required arguments.
-- `ERR_EMAIL_NOT_REGISTERED`: The provided email is not registered.
-- `ERR_INCORRECT_PASSWORD`: The password is incorrect.
 
 #### 500 Errors
 - `DBG_ERR_SQL_QUERY`: Unable to perform query.
@@ -168,3 +157,180 @@ Authenticate a user with the specified credentials.
 
 #### 401 Errors
 See [authentication](authentication)
+
+### modify_class
+
+Modify an existing course.
+
+#### Accepts
+```
+{
+  "internal_id": string,
+  "token": string,
+  "class_id": string
+  "class_name": string,
+  ~opt~ "class_code": string,
+  ~opt~ "color": number,
+  ~opt~ "weight": number
+}
+```
+
+#### Returns
+```
+{
+  "success": true (boolean),
+  "message": "Successfully modified class."
+}
+```
+
+#### 400 Errors
+- `ERR_MISSING_ARGS`: The request is missing required arguments.
+
+#### 500 Errors
+- `DBG_ERR_SQL_QUERY`: Unable to perform query.
+- `ERR_TOKEN_VERIFY`: Unable to verify token due to server-side malfunction.
+
+#### 401 Errors
+See [authentication](authentication)
+
+### delete_class
+
+Delete an existing course.
+
+#### Accepts
+```
+{
+  "internal_id": string,
+  "token": string,
+  "class_id": string
+}
+```
+
+#### Returns
+```
+{
+  "success": true (boolean),
+  "message": "Successfully deleted class."
+}
+```
+
+#### 400 Errors
+- `ERR_MISSING_ARGS`: The request is missing required arguments.
+- `ERR_EDIT_PERMISSSION`: User does not have edit permissions for this class.
+
+#### 500 Errors
+- `DBG_ERR_SQL_QUERY`: Unable to perform query.
+- `ERR_TOKEN_VERIFY`: Unable to verify token due to server-side malfunction.
+
+#### 401 Errors
+See [authentication](authentication)
+
+## Category Calls
+
+### create_category
+
+Create a new category in an existing course.
+
+#### Accepts
+```
+{
+  "internal_id": string,
+  "token": string,
+  "class_id": string,
+  "category_name": string,
+  ~opt~ "drop_count": number,
+  ~opt~ "weight": number
+}
+```
+
+#### Returns
+```
+{
+  "success": true (boolean),
+  "message": "Successfully added category to class."
+}
+```
+
+#### 400 Errors
+- `ERR_MISSING_ARGS`: The request is missing required arguments.
+- `ERR_EDIT_PERMISSSION`: User does not have edit permissions for this class.
+
+#### 500 Errors
+- `DBG_ERR_SQL_QUERY`: Unable to perform query.
+- `ERR_TOKEN_VERIFY`: Unable to verify token due to server-side malfunction.
+- `ERR_RANDSTR_GENERATION`: Unable to generate random string for category ID.
+
+#### 401 Errors
+See [authentication](authentication)
+
+### modify_category
+
+Modify an existing category in an existing course.
+
+#### Accepts
+```
+{
+  "internal_id": string,
+  "token": string,
+  "class_id": string,
+  "category_id": string,
+  "category_name": string,
+  ~opt~ "drop_count": number,
+  ~opt~ "weight": number
+}
+```
+
+#### Returns
+```
+{
+  "success": true (boolean),
+  "message": "Successfully modified category in class."
+}
+```
+
+#### 400 Errors
+- `ERR_MISSING_ARGS`: The request is missing required arguments.
+- `ERR_EDIT_PERMISSSION`: User does not have edit permissions for this class.
+
+#### 500 Errors
+- `DBG_ERR_SQL_QUERY`: Unable to perform query.
+- `ERR_TOKEN_VERIFY`: Unable to verify token due to server-side malfunction.
+- `ERR_EDIT_PERMISSSION`: User does not have edit permissions for this class.
+
+#### 401 Errors
+See [authentication](authentication)
+
+### delete_category
+
+Delete an existing category.
+
+#### Accepts
+```
+{
+  "internal_id": string,
+  "token": string,
+  "class_id": string,
+  "category_id": string
+}
+```
+
+#### Returns
+```
+{
+  "success": true (boolean),
+  "message": "Successfully deleted class."
+}
+```
+
+#### 400 Errors
+- `ERR_MISSING_ARGS`: The request is missing required arguments.
+- `ERR_EDIT_PERMISSSION`: User does not have edit permissions for this class.
+
+#### 500 Errors
+- `DBG_ERR_SQL_QUERY`: Unable to perform query.
+- `ERR_TOKEN_VERIFY`: Unable to verify token due to server-side malfunction.
+
+#### 401 Errors
+See [authentication](authentication)
+
+## Grade Calls
