@@ -119,19 +119,30 @@ function performAction(con: any, req: any, res: any, body: DeleteClassArgs, call
       var delSql = "DELETE FROM classes WHERE class_id = ?";
       var delArgs: [string] = [body.class_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
-        if (!delErr) {
-          callback(200, {
-            success: true,
-            message: "Successfully deleted class."
-          });
-        } else {
-          callback(500, {
-            success: false,
-            error: "DBG_ERR_SQL_QUERY",
-            message: "Unable to perform query.",
-            details: delErr
-          });
-        }
+        var delEditSql = "DELETE FROM edit_permissions WHERE class_id = ?";
+        var delEditArgs: [string] = [body.class_id];
+        con.query(delEditSql, delEditArgs, (delEditErr: QueryError, delEditRes: any, delEditFields: Object) => {
+          if (!delErr && !delEditErr) {
+            callback(200, {
+              success: true,
+              message: "Successfully deleted class."
+            });
+          } else if (delEditErr) {
+            callback(500, {
+              success: false,
+              error: "DBG_ERR_SQL_QUERY",
+              message: "Deleted class but did not delete permissions.",
+              details: delErr
+            });
+          } else {
+            callback(500, {
+              success: false,
+              error: "DBG_ERR_SQL_QUERY",
+              message: "Unable to perform query.",
+              details: delErr
+            });
+          }
+        });
       });
     } else if (editErr) {
       callback(500, {

@@ -20,6 +20,8 @@ import {
   numberFromSqlDec
 } from './helper';
 
+var currentClassID = "";
+
 /**
  * Create a new user.
  *
@@ -122,11 +124,17 @@ function performAction(con: any, req: any, res: any, body: GetClassesArgs, callb
       classIDs.push(result[i].class_id);
     }
     getClassDataSequentially(con, classIDs, 0, gradebook, (newGradebook: Gradebook, gcdsErr: QueryError) => {
-      if (!gcdsErr) {
+      if (!gcdsErr && newGradebook != null) {
         callback(200, {
           success: true,
           gradebook: newGradebook
-        })
+        });
+      } else if (gcdsErr == null && newGradebook == null) {
+        callback(400, {
+          success: false,
+          error: "ERR_MISSING_COURSE",
+          message: ("Course " + currentClassID + " is missing.")
+        });
       } else {
         callback(500, {
           success: false,
@@ -143,6 +151,7 @@ function performAction(con: any, req: any, res: any, body: GetClassesArgs, callb
 function getClassDataSequentially(con: any, classIDs: string[], index: number, gradebook: Gradebook, callback: (newGradebook: Gradebook, err: QueryError) => void) {
   var sql = "SELECT `class_name`, `class_code`, `color`, `weight`, `instructor` FROM `classes` WHERE `class_id` = ?";
   var args: [string] = [classIDs[index]];
+  currentClassID = classIDs[index];
   con.query(sql, args, (err: QueryError, result: any[], fields: Object) => {
     if (!err) {
       var catSql = "SELECT `category_id`, `category_name`, `drop_count`, `weight` FROM `categories` WHERE `class_id` = ?";
@@ -185,7 +194,7 @@ function getClassDataSequentially(con: any, classIDs: string[], index: number, g
                 }
               }
 
-              if (index == classIDs.length) {
+              if (index == classIDs.length - 1) {
                 callback(gradebook, err);
               } else {
                 getClassDataSequentially(con, classIDs, index + 1, gradebook, (recGB: Gradebook, recErr: QueryError) => {
@@ -194,20 +203,20 @@ function getClassDataSequentially(con: any, classIDs: string[], index: number, g
               }
             } else {
               if (catErr) {
-                callback(gradebook, catErr);
+                callback(null, catErr);
               } else if (grdErr) {
-                callback(gradebook, grdErr);
+                callback(null, grdErr);
               } else if (asgErr) {
-                callback(gradebook, grdErr);
-              } else {
-                callback(gradebook, null);
+                callback(null, asgErr);
+              } else if (result.length != 1){
+                callback(null, null);
               }
             }
           });
         });
       });
     } else {
-      callback(gradebook, err);
+      callback(null, err);
     }
   });
 }

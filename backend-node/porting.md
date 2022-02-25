@@ -112,7 +112,7 @@ void addCategoryButtonClicked() {
 
 void updateCategoryList() {
   categoryList.clear();
-  StringArray catIDs = Library.userData.class[selectedClassID].categories.key;
+  StringArray catIDs = Library.userData.class[selectedClassID].categories.keys;
   for (catID in catIDs) {
     categoryList.addItem(Library.userData.class[selectedClassID].categories[catID].name);
   }
