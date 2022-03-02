@@ -54,47 +54,7 @@ export function deleteCategory(con: any, req: any, res: any) {
  */
 function validateInput(con: any, req: any, res: any, body: DeleteCategoryArgs, callback: (statusCode: number, output: Object) => void) {
   if (body.internal_id != null && body.token != null && body.category_id != null && body.class_id != null) {
-
-    verifyToken(con, body.internal_id, body.token, (authStat: number, vtErr: Object) => {
-      if (authStat == 1) {
-        callback(200, null);
-      } else {
-        if (vtErr) { //only time authStat == 0
-          callback(500, {
-            success: false,
-            error: "DBG_ERR_SQL_QUERY",
-            message: "Unable to perform query.",
-            details: vtErr
-          });
-        } else if (authStat == 2) {
-          callback(401, {
-            success: false,
-            error: "ERR_TOKEN_NOT_AVAILABLE",
-            message: "A token has not been created for this user."
-          });
-        } else if (authStat == 3) {
-          callback(401, {
-            success: false,
-            error: "ERR_INVALID_TOKEN",
-            message: "The token is invalid."
-          });
-        } else if (authStat == 4) {
-          callback(401, {
-            success: false,
-            error: "ERR_TOKEN_EXPIRED",
-            message: "Token expired; please renew."
-          });
-        } else {
-          // This error should never be shown
-          // If it does, something is seriously wrong
-          callback(500, {
-            success: false,
-            error: "ERR_TOKEN_VERIFY",
-            message: "Unable to verify token due to server-side malfunction."
-          });
-        }
-      }
-    });
+    verifyToken(con, body.internal_id, body.token, callback);
   } else {
     callback(400, {
       success: false,
@@ -120,7 +80,7 @@ function performAction(con: any, req: any, res: any, body: DeleteCategoryArgs, c
       var delArgs: [string] = [body.category_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
         if (!delErr) {
-          deleteAssignmentsInCategory(body.category_id, (delAsgErr: Object) => {
+          deleteAssignmentsInCategory(con, body.category_id, (delAsgErr: Object) => {
             if (!delAsgErr) {
               callback(200, {
                 success: true,
@@ -161,9 +121,9 @@ function performAction(con: any, req: any, res: any, body: DeleteCategoryArgs, c
   });
 }
 
-function deleteAssignmentsInCategory(catID: string, callback: (error: Object) => void) {
+function deleteAssignmentsInCategory(con: any, catID: string, callback: (error: Object) => void) {
   var delSql = "DELETE FROM assignments WHERE category_id = ?";
-  var delArgs: [string] = [body.category_id];
+  var delArgs: [string] = [catID];
   con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
     callback(delErr);
   });

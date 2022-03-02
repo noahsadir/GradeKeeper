@@ -99,25 +99,42 @@ export function verifyPassword(con: any, email: string, password: string, callba
   });
 }
 
-export function verifyToken(con: any, internalID: string, token: string, callback: (authStat: number, err: Object) => void) {
+export function verifyToken(con: any, internalID: string, token: string, callback: (vtStatusCode: number, vtErr: Object) => void) {
   var sql = "SELECT `token`, `expiration` FROM `tokens` WHERE `internal_id` = ?";
   var args: [string] = [internalID];
   con.query(sql, args, (err: QueryError, result: any[], fields: Object) => {
     if (err) {
-      callback(0, err);
+      callback(500, {
+        success: false,
+        error: "DBG_ERR_SQL_QUERY",
+        message: "Unable to perform query.",
+        details: err
+      });
     } else if (result.length != 1) {
-      callback(2, null);
+      callback(401, {
+        success: false,
+        error: "ERR_TOKEN_NOT_AVAILABLE",
+        message: "A token has not been created for this user."
+      });
     } else {
       var fetchedToken: string = result[0]['token'];
       var expiration: number = result[0]['expiration'];
       if (token == fetchedToken) {
         if (expiration > Math.round(Date.now() / 1000)) {
-          callback(1, null);
+          callback(200, null);
         } else {
-          callback(4, null);
+          callback(401, {
+            success: false,
+            error: "ERR_TOKEN_EXPIRED",
+            message: "Token expired; please renew."
+          });
         }
       } else {
-        callback(3, null);
+        callback(401, {
+          success: false,
+          error: "ERR_INVALID_TOKEN",
+          message: "The token is invalid."
+        });
       }
     }
   });
