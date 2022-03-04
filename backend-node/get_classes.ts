@@ -1,15 +1,31 @@
-/*******************************
- * create_user.ts              *
- * --------------------------- *
- * Created by Noah Sadir       *
- *         on October 19, 2021 *
- *******************************/
+// get_classes.ts
+/*
+ Copyright (c) 2021-2022 Noah Sadir
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import {
   Credentials,
   QueryError,
   GetClassesArgs,
-  Gradebook
+  Gradebook,
+  Timeslot
 } from './interfaces';
 
 import {
@@ -23,7 +39,7 @@ import {
 var currentClassID = "";
 
 /**
- * Create a new user.
+ * Get all class data (not including assignments or files) for user.
  *
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
@@ -120,58 +136,79 @@ function getClassDataSequentially(con: any, classIDs: string[], index: number, g
         con.query(grdSql, args, (grdErr: QueryError, grdRes: any[], grdFields: Object) => {
           var asgSql = "SELECT `assignment_id`, `category_id` FROM `items` WHERE `class_id` = ?";
           con.query(asgSql, args, (asgErr: QueryError, asgRes: any[], asgFields: Object) => {
-            if (!catErr && !grdErr && !asgErr && result.length == 1) {
-              gradebook.classes[classIDs[index]] = {
-                name: result[0].class_name,
-                code: result[0].class_code,
-                color: result[0].color,
-                weight: numberFromSqlDec(result[0].weight),
-                instructor: result[0].instructor,
-                grade_scale: {},
-                categories: {}
-              };
-
-              for (var i in catRes) {
-                gradebook.classes[classIDs[index]].categories[catRes[i].category_id] = {
-                  category_name: catRes[i].category_name,
-                  drop_count: catRes[i].drop_count,
-                  weight: numberFromSqlDec(catRes[i].weight),
-                  assignments: []
+            var schSql = "SELECT * FROM schedule WHERE class_id = ?";
+            con.query(schSql, args, (schErr: QueryError, schRes: any[]) => {
+              if (!catErr && !grdErr && !asgErr && !schErr && result.length == 1) {
+                gradebook.classes[classIDs[index]] = {
+                  name: result[0].class_name,
+                  code: result[0].class_code,
+                  color: result[0].color,
+                  weight: numberFromSqlDec(result[0].weight),
+                  instructor: result[0].instructor,
+                  grade_scale: {},
+                  categories: {},
+                  timeslots: []
                 };
-              }
 
-              for (var i in grdRes) {
-                gradebook.classes[classIDs[index]].grade_scale[grdRes[i].grade_id] = {
-                  min_score: numberFromSqlDec(grdRes[i].min_score),
-                  max_score: numberFromSqlDec(grdRes[i].max_score),
-                  credit: numberFromSqlDec(grdRes[i].credit)
-                };
-              }
 
-              for (var i in asgRes) {
-                if (gradebook.classes[classIDs[index]].categories[asgRes[i].category_id] != null) {
-                  gradebook.classes[classIDs[index]].categories[asgRes[i].category_id].assignments.push(asgRes[i].assignment_id);
+                for (var i in schRes) {
+                  var newTimeslot: Timeslot = {
+                    day_of_week: schRes[i].day_of_week,
+                    start_time: schRes[i].start_time,
+                    end_time: schRes[i].end_time,
+                    start_date: schRes[i].start_date,
+                    end_date: schRes[i].end_date,
+                    description: schRes[i].description,
+                    address: schRes[i].address
+                  };
+
+                  gradebook.classes[classIDs[index]].timeslots.push(newTimeslot);
+                }
+
+                for (var i in catRes) {
+                  gradebook.classes[classIDs[index]].categories[catRes[i].category_id] = {
+                    category_name: catRes[i].category_name,
+                    drop_count: catRes[i].drop_count,
+                    weight: numberFromSqlDec(catRes[i].weight),
+                    assignments: []
+                  };
+                }
+
+                for (var i in grdRes) {
+                  gradebook.classes[classIDs[index]].grade_scale[grdRes[i].grade_id] = {
+                    min_score: numberFromSqlDec(grdRes[i].min_score),
+                    max_score: numberFromSqlDec(grdRes[i].max_score),
+                    credit: numberFromSqlDec(grdRes[i].credit)
+                  };
+                }
+
+                for (var i in asgRes) {
+                  if (gradebook.classes[classIDs[index]].categories[asgRes[i].category_id] != null) {
+                    gradebook.classes[classIDs[index]].categories[asgRes[i].category_id].assignments.push(asgRes[i].assignment_id);
+                  }
+                }
+
+                if (index == classIDs.length - 1) {
+                  callback(gradebook, err);
+                } else {
+                  getClassDataSequentially(con, classIDs, index + 1, gradebook, (recGB: Gradebook, recErr: QueryError) => {
+                    callback(recGB, recErr);
+                  });
+                }
+              } else {
+                if (catErr) {
+                  callback(null, catErr);
+                } else if (grdErr) {
+                  callback(null, grdErr);
+                } else if (asgErr) {
+                  callback(null, asgErr);
+                } else if (schErr) {
+                  callback(null, schErr);
+                } else if (result.length != 1){
+                  callback(null, null);
                 }
               }
-
-              if (index == classIDs.length - 1) {
-                callback(gradebook, err);
-              } else {
-                getClassDataSequentially(con, classIDs, index + 1, gradebook, (recGB: Gradebook, recErr: QueryError) => {
-                  callback(recGB, recErr);
-                });
-              }
-            } else {
-              if (catErr) {
-                callback(null, catErr);
-              } else if (grdErr) {
-                callback(null, grdErr);
-              } else if (asgErr) {
-                callback(null, asgErr);
-              } else if (result.length != 1){
-                callback(null, null);
-              }
-            }
+            });
           });
         });
       });

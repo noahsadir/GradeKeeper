@@ -1,4 +1,4 @@
-// modify_grade.ts
+// set_class_schedule.ts
 /*
  Copyright (c) 2021-2022 Noah Sadir
 
@@ -23,7 +23,8 @@
 import {
   Credentials,
   QueryError,
-  ModifyGradeArgs
+  Timeslot,
+  SetClassScheduleArgs
 } from './interfaces';
 
 import {
@@ -40,9 +41,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function modifyGrade(con: any, req: any, res: any) {
+export function setClassSchedule(con: any, req: any, res: any) {
 
-  var body: ModifyGradeArgs = req.body;
+  var body: SetClassScheduleArgs = req.body;
 
   validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -65,11 +66,27 @@ export function modifyGrade(con: any, req: any, res: any) {
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {ModifyGradeArgs} body the arguments provided by the user
+ * @param {SetClassScheduleArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: ModifyGradeArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.grade_id != null) {
-    verifyToken(con, body.internal_id, body.token, callback);
+function validateInput(con: any, req: any, res: any, body: SetClassScheduleArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null && body.class_id != null && body.timeslots != null) {
+    var validTimeslots: boolean = true;
+
+    for (var i in body.timeslots) {
+      if (body.timeslots[i].day_of_week == null || body.timeslots[i].start_time == null || body.timeslots[i].end_time == null) {
+        validTimeslots = false;
+      }
+    }
+
+    if (validTimeslots) {
+      verifyToken(con, body.internal_id, body.token, callback);
+    } else {
+      callback(400, {
+        success: false,
+        error: "ERR_INVALID_TIMESLOT",
+        message: "One or more invalid timeslots found."
+      })
+    }
   } else {
     callback(400, {
       success: false,
@@ -86,31 +103,32 @@ function validateInput(con: any, req: any, res: any, body: ModifyGradeArgs, call
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {ModifyGradeArgs} body the arguments provided by the user
+ * @param {SetClassScheduleArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: ModifyGradeArgs, callback: (statusCode: number, output: Object) => void) {
-
+function performAction(con: any, req: any, res: any, body: SetClassScheduleArgs, callback: (statusCode: number, output: Object) => void) {
+  //Generate internal ID
   getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
-    if (hasPermission && !editErr) {
-      var delSql = "DELETE FROM grade_scales WHERE class_id = ? AND grade_id = ?";
-      var delArgs: [string, string] = [body.class_id, body.grade_id];
-      con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
+    if (!editErr && hasPermission) {
+      deleteSchedule(con, body, (delErr: QueryError) => {
         if (!delErr) {
-          var sql = "INSERT INTO grade_scales (class_id, grade_id, min_score, max_score, credit) VALUES (?, ?, ?, ?, ?)";
-          var args: [string, string, number, number, number] = [body.class_id, body.grade_id, body.min_score, body.max_score, body.credit];
-
-          con.query(sql, args, function (grdErr: Object, result: Object) {
-            if (!grdErr) {
+          addTimeSlotsRecursively(con, body, 0, (errInd: number, atsErr: QueryError) => {
+            if (errInd >= body.timeslots.length - 1) {
               callback(200, {
                 success: true,
-                message: "Successfully modified grade to scale for class."
+                message: "Successfully set class schedule."
+              });
+            } else if (!atsErr) {
+              callback(500, {
+                success: false,
+                error: "ERR_TIMESLOT_ADD",
+                message: "Unable to add timeslot " + errInd.toString(),
               });
             } else {
               callback(500, {
                 success: false,
                 error: "DBG_ERR_SQL_QUERY",
                 message: "Unable to perform query.",
-                details: grdErr
+                details: atsErr
               });
             }
           });
@@ -138,4 +156,36 @@ function performAction(con: any, req: any, res: any, body: ModifyGradeArgs, call
       });
     }
   });
+}
+
+function deleteSchedule(con: any, body: SetClassScheduleArgs, callback: (error: QueryError) => void) {
+  var sql = "DELETE FROM schedule WHERE class_id = ?";
+  var args: [string] = [body.class_id];
+
+  con.query(sql, args, (err: QueryError, res: any[]) => {
+    callback(err);
+  });
+}
+
+function addTimeSlotsRecursively(con: any, body: SetClassScheduleArgs, index: number, callback: (index: number, error: QueryError) => void) {
+
+  var selectedTimeslot: Timeslot = body.timeslots[index];
+  if (selectedTimeslot != null) {
+    var sql = "INSERT INTO schedule (class_id, day_of_week, start_time, end_time, start_date, end_date, description, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    var args: [string, number, number, number, number, number, string, string] = [body.class_id, selectedTimeslot.day_of_week, selectedTimeslot.start_time, selectedTimeslot.end_time, selectedTimeslot.start_date, selectedTimeslot.end_date, selectedTimeslot.description, selectedTimeslot.address];
+
+    con.query(sql, args, (err: QueryError, res: any[]) => {
+      if (!err) {
+        if (index < body.timeslots.length - 1) {
+          addTimeSlotsRecursively(con, body, index + 1, callback);
+        } else {
+          callback(index, null);
+        }
+      } else {
+        callback(index, err);
+      }
+    });
+  } else {
+    callback(index, null);
+  }
 }

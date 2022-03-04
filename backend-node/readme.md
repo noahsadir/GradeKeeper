@@ -332,5 +332,3 @@ Delete an existing category.
 
 #### 401 Errors
 See [authentication](authentication)
-
-## Grade Calls

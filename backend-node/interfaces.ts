@@ -1,3 +1,25 @@
+// interfaces.ts
+/*
+ Copyright (c) 2021-2022 Noah Sadir
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
 export interface Credentials {
   host: string;
   user: string;
@@ -17,6 +39,29 @@ export interface CreateUserArgs {
   api_key: string; // required
   email: string; // required
   password: string; // required
+}
+
+export interface Timeslot {
+  day_of_week: number;
+  start_time: number;
+  end_time: number;
+  start_date: number;
+  end_date: number;
+  description: string;
+  address: string;
+}
+
+export interface SetClassScheduleArgs {
+  internal_id: string;
+  token: string;
+  class_id: string;
+  timeslots: Timeslot[];
+}
+
+export interface GetClassScheduleArgs {
+  internal_id: string;
+  token: string;
+  class_id: string;
 }
 
 export interface AuthenticateUserArgs {
@@ -199,46 +244,4 @@ export interface GetTermsArgs {
 
 export interface GetLogsArgs {
   api_key: string
-}
-
-
-/* Gradebook Objects */
-
-export interface Grade {
-  id: string;
-  min_score: number;
-  max_score: number;
-  credit: number;
-}
-
-export interface Assignment {
-  title: string;
-  description: string;
-  grade_id: string;
-  act_score: number;
-  max_score: number;
-  penalty: number;
-  weight: number;
-  assign_date: number;
-  due_date: number;
-  graded_date: number;
-}
-
-export interface Category {
-  name: string;
-  weight: number;
-  drop_count: number;
-  assignments: any;
-}
-
-export interface Class {
-  name: string;
-  code: string;
-  color: number;
-  grade_scale: Grade[];
-  categories: any;
-}
-
-export interface Gradebook {
-  classes: any;
 }
