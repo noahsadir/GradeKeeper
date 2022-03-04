@@ -1,4 +1,4 @@
-# GradeKeeper API
+# Courseman API
 
 ## Handling Errors
 All calls made to the API should return a JSON object with the property `success`

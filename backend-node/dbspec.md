@@ -1,4 +1,4 @@
-# Database Layout
+# Database Specification
 
 ## api_keys
 Field   | Type        | Null | Key | Default | Extra |
