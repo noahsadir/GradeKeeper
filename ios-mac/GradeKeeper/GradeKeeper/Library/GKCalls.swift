@@ -1,11 +1,29 @@
-//
 //  GKCalls.swift
-//  GradeKeeper
-//
-//  Created by Noah Sadir on 12/18/21.
-//
-//  PURPOSE: Provides near-direct Swift bindings to all relevant API calls.
-//
+/*
+ Copyright (c) 2021-2022 Noah Sadir
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+// Handles all the ugly network stuff by creating a programmer-friendly interface to all
+// the POST requests and authentication needed for the API.
+
+// Though not guaranteed, this code will likely save you a visit to a mental institution
 
 import Foundation
 
@@ -66,13 +84,15 @@ class GKCalls {
         postAuthenticated(user, url: apiUrl("create_category"), args: args, callback: callback)
     }
     
-    public func createCourse(_ user: UnsafeMutablePointer<User>, courseName: String, courseCode: String?, color: Int?, weight: Double?,  callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
+    public func createCourse(_ user: UnsafeMutablePointer<User>, termID: String?, courseName: String, courseCode: String?, color: Int?, weight: Double?, instructor: String?, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
         
         var args = [String: Any]()
         args["class_name"] = courseName
         args["class_code"] = courseCode
         args["color"] = color
         args["weight"] = weight
+        args["instructor"] = instructor
+        args["term_id"] = termID
         
         postAuthenticated(user, url: apiUrl("create_class"), args: args, callback: callback)
     }
@@ -87,6 +107,16 @@ class GKCalls {
         args["credit"] = credit
         
         postAuthenticated(user, url: apiUrl("create_grade"), args: args, callback: callback)
+    }
+    
+    public func createTerm(_ user: UnsafeMutablePointer<User>, termTitle: String, startDate: UInt64?, endDate: UInt64?, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
+        
+        var args = [String: Any]()
+        args["term_title"] = termTitle
+        args["start_date"] = startDate
+        args["end_date"] = endDate
+        
+        postAuthenticated(user, url: apiUrl("create_term"), args: args, callback: callback)
     }
     
     public func modifyAssignment(_ user: UnsafeMutablePointer<User>, courseID: String, categoryID: String, assignmentID: String, title: String?, description: String?, gradeID: String?, actScore: Double?, maxScore: Double?, weight: Double?, penalty: Double?, dueDate: UInt64?, assignDate: UInt64?, gradedDate: UInt64?, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
@@ -121,7 +151,7 @@ class GKCalls {
         postAuthenticated(user, url: apiUrl("modify_category"), args: args, callback: callback)
     }
     
-    public func modifyCourse(_ user: UnsafeMutablePointer<User>, courseID: String, courseName: String, courseCode: String?, color: Int?, weight: Double?,  callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
+    public func modifyCourse(_ user: UnsafeMutablePointer<User>, courseID: String, termID: String?, courseName: String, courseCode: String?, color: Int?, weight: Double?, instructor: String?,  callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
         
         var args = [String: Any]()
         args["class_id"] = courseID
@@ -129,6 +159,8 @@ class GKCalls {
         args["class_code"] = courseCode
         args["color"] = color
         args["weight"] = weight
+        args["instructor"] = instructor
+        args["term_id"] = termID
         
         postAuthenticated(user, url: apiUrl("modify_class"), args: args, callback: callback)
     }
@@ -143,6 +175,17 @@ class GKCalls {
         args["credit"] = credit
         
         postAuthenticated(user, url: apiUrl("modify_grade"), args: args, callback: callback)
+    }
+    
+    public func modifyTerm(_ user: UnsafeMutablePointer<User>, termID: String, termTitle: String, startDate: UInt64?, endDate: UInt64?, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
+        
+        var args = [String: Any]()
+        args["term_id"] = termID
+        args["term_title"] = termTitle
+        args["start_date"] = startDate
+        args["end_date"] = endDate
+        
+        postAuthenticated(user, url: apiUrl("modify_term"), args: args, callback: callback)
     }
     
     public func deleteAssignment(_ user: UnsafeMutablePointer<User>, courseID: String, assignmentID: String, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
@@ -163,6 +206,31 @@ class GKCalls {
         postAuthenticated(user, url: apiUrl("delete_category"), args: args, callback: callback)
     }
     
+    public func deleteGrade(_ user: UnsafeMutablePointer<User>, courseID: String, gradeID: String, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
+        
+        var args = [String: Any]()
+        args["class_id"] = courseID
+        args["grade_id"] = gradeID
+        
+        postAuthenticated(user, url: apiUrl("delete_grade"), args: args, callback: callback)
+    }
+    
+    public func deleteTerm(_ user: UnsafeMutablePointer<User>, termID: String, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
+        
+        var args = [String: Any]()
+        args["term_id"] = termID
+        
+        postAuthenticated(user, url: apiUrl("delete_term"), args: args, callback: callback)
+    }
+    
+    public func deleteCourse(_ user: UnsafeMutablePointer<User>, courseID: String, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
+        
+        var args = [String: Any]()
+        args["class_id"] = courseID
+        
+        postAuthenticated(user, url: apiUrl("delete_class"), args: args, callback: callback)
+    }
+    
     public func getAssignments(_ user: UnsafeMutablePointer<User>, courseID: String, ignoreBeforeDate: UInt64?, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
         
         var args = [String: Any]()
@@ -177,6 +245,13 @@ class GKCalls {
         let args = [String: Any]()
         
         postAuthenticated(user, url: apiUrl("get_classes"), args: args, callback: callback)
+    }
+    
+    public func getTerms(_ user: UnsafeMutablePointer<User>, callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
+        
+        let args = [String: Any]()
+        
+        postAuthenticated(user, url: apiUrl("get_terms"), args: args, callback: callback)
     }
     
     private func apiUrl(_ callType: String) -> URL {
@@ -209,7 +284,8 @@ class GKCalls {
     ///        *NOTE:* If the request was successful, `error == nil`
     private func postUnauthenticated(url: URL, args: [String: Any], callback: @escaping (_ success: Bool, _ result: [String: Any]?, _ error: APIError?) -> Void) {
         let json = try? JSONSerialization.data(withJSONObject: args)
-        
+            
+        print("POST " + url.description)
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.httpBody = json

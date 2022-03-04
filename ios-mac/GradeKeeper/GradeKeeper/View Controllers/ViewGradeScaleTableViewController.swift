@@ -1,9 +1,24 @@
-//
 //  ViewGradeScaleTableViewController.swift
-//  GradeKeeper
-//
-//  Created by Noah Sadir on 12/19/21.
-//
+/*
+ Copyright (c) 2021-2022 Noah Sadir
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import UIKit
 
@@ -67,44 +82,84 @@ class ViewGradeScaleTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 1
+        return 2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if section == 0 {
+            return 2
+        }
         // #warning Incomplete implementation, return the number of rows
         return gradeIDs.count
     }
 
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            return "Actions"
+        }
+        return "Select grade to edit"
+    }
     /**/
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "gradeCell", for: indexPath) as! GradeScaleTableViewCell
         
-        if let selectedCourse = selectedCourse {
-            cell.gradeLabel.text = gradeIDs[indexPath.row]
-            let grade = selectedCourse.gradeScale[gradeIDs[indexPath.row]]!
-            if let maxScore = grade.maxScore {
-                cell.rangeLabel.text = String(grade.minScore) + " - " + String(maxScore)
-            } else {
-                cell.rangeLabel.text = String(grade.minScore) + "+"
+        if indexPath.section == 0 {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "actionCell", for: indexPath) as UITableViewCell
+            
+            if indexPath.row == 0 {
+                cell.textLabel?.text = "Replace with preset"
+            } else if indexPath.row == 1 {
+                cell.textLabel?.text = "Save as preset"
+                if gradeIDs.count == 0 {
+                    cell.textLabel?.textColor = .secondaryLabel
+                    cell.selectionStyle = .none
+                }
             }
             
-            cell.creditLabel.text = "Credit: " + String(grade.credit)
+            return cell
+        } else {
+            let cell = tableView.dequeueReusableCell(withIdentifier: "gradeCell", for: indexPath) as! GradeScaleTableViewCell
+            
+            if let selectedCourse = selectedCourse {
+                cell.gradeLabel.text = gradeIDs[indexPath.row]
+                let grade = selectedCourse.gradeScale[gradeIDs[indexPath.row]]!
+                if let maxScore = grade.maxScore {
+                    cell.rangeLabel.text = String(grade.minScore) + " - " + String(maxScore)
+                } else {
+                    cell.rangeLabel.text = String(grade.minScore) + "+"
+                }
+                
+                cell.creditLabel.text = "Credit: " + String(grade.credit)
+            }
+            return cell
         }
+        
 
         // Configure the cell...
 
-        return cell
+        return UITableViewCell()
     }
     /**/
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 65.0
+        if indexPath.section == 0 {
+            return 45
+        }
+        return 55
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        ViewGradeScaleTableViewController.selectedGradeID = gradeIDs[indexPath.row]
-        performSegue(withIdentifier: "editGradeScale", sender: nil)
-        tableView.deselectRow(at: indexPath, animated: true)
+        if indexPath.section == 0 {
+            
+        } else if indexPath.section == 1 {
+            ViewGradeScaleTableViewController.selectedGradeID = gradeIDs[indexPath.row]
+            performSegue(withIdentifier: "editGradeScale", sender: nil)
+            tableView.deselectRow(at: indexPath, animated: true)
+        }
+        
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 40
     }
     /*
     // Override to support conditional editing of the table view.

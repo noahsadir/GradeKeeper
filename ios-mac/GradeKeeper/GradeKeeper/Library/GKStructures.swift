@@ -1,35 +1,53 @@
-//
 //  GKStructures.swift
-//  GradeKeeper
-//
-//  Created by Noah Sadir on 12/18/21.
-//
-//  PURPOSE: Defines data structures for GradeKeeper
-//
+/*
+ Copyright (c) 2021-2022 Noah Sadir
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+// Converts all that JSON data into easy(ish)-to-use Swift structures.
 
 import Foundation
 
 struct Course: Codable {
     var courseName: String
-    var courseCode: String
+    var courseCode: String?
     var color: Int
     var weight: Double
     var categories: [String: Category]
     var gradeScale: [String: Grade]
+    var schedule: [Timeslot]
     var instructor: String?
     var editable: Bool
+    var defaultCategoryID: String?
+    
     
     init(dictionary: [String: Any]) {
         self.courseName = dictionary["name"] as? String ?? "Unnamed Course"
-        self.courseCode = dictionary["code"] as? String ?? ""
+        self.courseCode = dictionary["code"] as? String
         self.color = dictionary["color"] as? Int ?? 0
         self.weight = dictionary["weight"] as? Double ?? 1
         self.instructor = dictionary["instructor"] as? String
         
         self.categories = [String: Category]()
         self.gradeScale = [String: Grade]()
+        self.schedule = [Timeslot]()
         self.editable = false
-        
         
         if let categories = dictionary["categories"] as? [String: [String: Any]] {
             for category in categories {
@@ -43,6 +61,11 @@ struct Course: Codable {
             }
         }
         
+        if let timeslots = dictionary["timeslots"] as? [[String: Any]] {
+            for timeslot in timeslots {
+                self.schedule.append(Timeslot(dictionary: timeslot))
+            }
+        }
     }
     
     init(courseName: String?, courseCode: String?, color: Int?, weight: Double?) {
@@ -52,7 +75,28 @@ struct Course: Codable {
         self.weight = weight ?? 1
         self.categories = [String: Category]()
         self.gradeScale = [String: Grade]()
+        self.schedule = [Timeslot]()
         self.editable = false
+    }
+}
+
+struct Timeslot: Codable {
+    var dayOfWeek: Int
+    var startTime: Int
+    var endTime: Int
+    var startDate: UInt64?
+    var endDate: UInt64?
+    var description: String
+    var address: String?
+    
+    init(dictionary: [String: Any]) {
+        self.dayOfWeek = dictionary["day_of_week"] as? Int ?? 0
+        self.startTime = dictionary["start_time"] as? Int ?? 0
+        self.endTime = dictionary["end_time"] as? Int ?? 0
+        self.startDate = dictionary["start_date"] as? UInt64
+        self.endDate = dictionary["end_date"] as? UInt64
+        self.description = dictionary["description"] as? String ?? ""
+        self.address = dictionary["address"] as? String
     }
 }
 
@@ -89,7 +133,7 @@ struct Grade: Codable {
     init(minScore: Double, maxScore: Double?, credit: Double?) {
         self.minScore = minScore
         self.maxScore = maxScore
-        self.credit = credit as? Double ?? 1
+        self.credit = credit ?? 1
     }
 }
 
@@ -161,15 +205,22 @@ struct APIError: Codable {
 
 struct Term: Codable {
     var title: String
-    var startDate: UInt64
-    var endDate: UInt64
+    var startDate: UInt64?
+    var endDate: UInt64?
     var courseIDs: [String]
     
-    init(title: String, startDate: UInt64, endDate: UInt64) {
+    init(title: String, startDate: UInt64?, endDate: UInt64?) {
         self.title = title
         self.startDate = startDate
         self.endDate = endDate
         self.courseIDs = [String]()
+    }
+    
+    init(dictionary: [String: Any]) {
+        self.title = dictionary["term_title"] as? String ?? ""
+        self.startDate = dictionary["start_date"] as? UInt64
+        self.endDate = dictionary["end_date"] as? UInt64
+        self.courseIDs = dictionary["class_ids"] as? [String] ?? []
     }
 }
 
@@ -210,31 +261,28 @@ struct User: Codable {
     
     func configClasses(dictionary: [String: Any]) -> [String: Course] {
         var newCourses = [String: Course]()
-        if let courses = dictionary["classes"] as? [String: [String: Any]] {
-            for course in courses {
-                newCourses[course.key] = Course(dictionary: course.value)
+        
+        if let courseDicts = dictionary["classes"] as? [String: [String: Any]] {
+            for courseDict in courseDicts {
+                var defaultCatID: String?
+                if let existingCourse = self.courses[courseDict.key] {
+                    defaultCatID = existingCourse.defaultCategoryID
+                }
+                newCourses[courseDict.key] = Course(dictionary: courseDict.value)
+                newCourses[courseDict.key]?.defaultCategoryID = defaultCatID
             }
         }
         return newCourses
     }
     
-}
-
-/*
-struct Gradebook: Codable {
-    var courses: [String: Course]
-    
-    init(dictionary: [String: Any]) {
-        self.courses = [String: Course]()
-        
-        if let courses = dictionary["classes"] as? [String: [String: Any]] {
-            for course in courses {
-                self.courses[course.key] = Course(dictionary: course.value)
+    func configTerms(dictionary: [String: Any]) -> [String: Term] {
+        var newTerms = [String: Term]()
+        if let terms = dictionary as? [String: [String: Any]] {
+            for term in terms {
+                newTerms[term.key] = Term(dictionary: term.value)
             }
         }
+        return newTerms
     }
     
-    init() {
-        self.courses = [String: Course]()
-    }
-}*/
+}

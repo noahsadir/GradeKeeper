@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF22668E27C7E5300008CAD8 /* OverallGradeTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF22668D27C7E5300008CAD8 /* OverallGradeTableViewCell.swift */; };
+		FF22669027CAB1D90008CAD8 /* CategorySummaryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF22668F27CAB1D90008CAD8 /* CategorySummaryTableViewCell.swift */; };
+		FF2CB21627C2B8B2007C1DE7 /* TermHeaderTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF2CB21527C2B8B2007C1DE7 /* TermHeaderTableViewCell.swift */; };
+		FF2CB21827C2BD88007C1DE7 /* CourseSelectionTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF2CB21727C2BD88007C1DE7 /* CourseSelectionTableViewCell.swift */; };
 		FF31E3C0271A57930060BFFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF31E3BF271A57930060BFFB /* AppDelegate.swift */; };
 		FF31E3C2271A57930060BFFB /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF31E3C1271A57930060BFFB /* SceneDelegate.swift */; };
 		FF31E3C4271A57930060BFFB /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF31E3C3271A57930060BFFB /* ViewController.swift */; };
@@ -35,6 +39,9 @@
 		FFC1470F2770455800417299 /* ViewCourseDetailsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC1470E2770455800417299 /* ViewCourseDetailsTableViewController.swift */; };
 		FFC6855D272A3F8D00CDFE99 /* MainTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */; };
 		FFC6855F272A3FB900CDFE99 /* GradeKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */; };
+		FFCCDCAD27AF206800E8C6CD /* SelectTermTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCCDCAC27AF206800E8C6CD /* SelectTermTableViewController.swift */; };
+		FFCCDCAF27AF81EE00E8C6CD /* CreateTermTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFCCDCAE27AF81EE00E8C6CD /* CreateTermTableViewController.swift */; };
+		FFFCC8B727C311E800110E93 /* ViewTermTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFCC8B627C311E800110E93 /* ViewTermTableViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,7 +62,11 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		FF31E3BC271A57930060BFFB /* GradeKeeper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GradeKeeper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF22668D27C7E5300008CAD8 /* OverallGradeTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverallGradeTableViewCell.swift; sourceTree = "<group>"; };
+		FF22668F27CAB1D90008CAD8 /* CategorySummaryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySummaryTableViewCell.swift; sourceTree = "<group>"; };
+		FF2CB21527C2B8B2007C1DE7 /* TermHeaderTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TermHeaderTableViewCell.swift; sourceTree = "<group>"; };
+		FF2CB21727C2BD88007C1DE7 /* CourseSelectionTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseSelectionTableViewCell.swift; sourceTree = "<group>"; };
+		FF31E3BC271A57930060BFFB /* Courseman.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Courseman.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF31E3BF271A57930060BFFB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FF31E3C1271A57930060BFFB /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		FF31E3C3271A57930060BFFB /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -63,10 +74,10 @@
 		FF31E3C8271A57950060BFFB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FF31E3CB271A57950060BFFB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		FF31E3CD271A57950060BFFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FF31E3D2271A57950060BFFB /* GradeKeeperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GradeKeeperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF31E3D2271A57950060BFFB /* CoursemanTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoursemanTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF31E3D6271A57950060BFFB /* GradeKeeperTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeKeeperTests.swift; sourceTree = "<group>"; };
 		FF31E3D8271A57950060BFFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		FF31E3DD271A57950060BFFB /* GradeKeeperUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GradeKeeperUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF31E3DD271A57950060BFFB /* CoursemanUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CoursemanUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF31E3E1271A57950060BFFB /* GradeKeeperUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeKeeperUITests.swift; sourceTree = "<group>"; };
 		FF31E3E3271A57950060BFFB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		FF5E6E94272C501B006F895E /* GradeKeeper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GradeKeeper.entitlements; sourceTree = "<group>"; };
@@ -90,6 +101,9 @@
 		FFC1470E2770455800417299 /* ViewCourseDetailsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCourseDetailsTableViewController.swift; sourceTree = "<group>"; };
 		FFC6855C272A3F8D00CDFE99 /* MainTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewController.swift; sourceTree = "<group>"; };
 		FFC6855E272A3FB900CDFE99 /* GradeKeeper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradeKeeper.swift; sourceTree = "<group>"; };
+		FFCCDCAC27AF206800E8C6CD /* SelectTermTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectTermTableViewController.swift; sourceTree = "<group>"; };
+		FFCCDCAE27AF81EE00E8C6CD /* CreateTermTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTermTableViewController.swift; sourceTree = "<group>"; };
+		FFFCC8B627C311E800110E93 /* ViewTermTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewTermTableViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,9 +144,9 @@
 		FF31E3BD271A57930060BFFB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				FF31E3BC271A57930060BFFB /* GradeKeeper.app */,
-				FF31E3D2271A57950060BFFB /* GradeKeeperTests.xctest */,
-				FF31E3DD271A57950060BFFB /* GradeKeeperUITests.xctest */,
+				FF31E3BC271A57930060BFFB /* Courseman.app */,
+				FF31E3D2271A57950060BFFB /* CoursemanTests.xctest */,
+				FF31E3DD271A57950060BFFB /* CoursemanUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -181,15 +195,18 @@
 				FF67D71B272B05BF00E847A2 /* LoginViewController.swift */,
 				FFC14702276FEB5900417299 /* CreateCourseTableViewController.swift */,
 				FF5E6E9D2731C991006F895E /* CreateCategoryTableViewController.swift */,
+				FFCCDCAE27AF81EE00E8C6CD /* CreateTermTableViewController.swift */,
 				FF5E6E97272C6141006F895E /* EditAssignmentTableViewController.swift */,
 				FFC14704277033B500417299 /* EditGradeTableViewController.swift */,
 				FFC14706277033BE00417299 /* EditCategoryTableViewController.swift */,
+				FFFCC8B627C311E800110E93 /* ViewTermTableViewController.swift */,
 				FFC14708277033EF00417299 /* ViewCategoriesTableViewController.swift */,
 				FFC1470A2770340000417299 /* ViewGradeScaleTableViewController.swift */,
 				FF5E6E9F27363ED9006F895E /* ViewAssignmentTableViewController.swift */,
 				FF67D721272B1F5700E847A2 /* ViewCourseTableViewController.swift */,
 				FFC1470E2770455800417299 /* ViewCourseDetailsTableViewController.swift */,
 				FF5E6E9B27306438006F895E /* SelectCategoryTableViewController.swift */,
+				FFCCDCAC27AF206800E8C6CD /* SelectTermTableViewController.swift */,
 			);
 			path = "View Controllers";
 			sourceTree = "<group>";
@@ -208,8 +225,12 @@
 			isa = PBXGroup;
 			children = (
 				FF67D71D272B1A5A00E847A2 /* CourseListTableViewCell.swift */,
+				FF2CB21727C2BD88007C1DE7 /* CourseSelectionTableViewCell.swift */,
 				FF67D71F272B1D1D00E847A2 /* AssignmentTableViewCell.swift */,
+				FF22668D27C7E5300008CAD8 /* OverallGradeTableViewCell.swift */,
 				FFC1470C2770342800417299 /* GradeScaleTableViewCell.swift */,
+				FF2CB21527C2B8B2007C1DE7 /* TermHeaderTableViewCell.swift */,
+				FF22668F27CAB1D90008CAD8 /* CategorySummaryTableViewCell.swift */,
 			);
 			path = "Table Cells";
 			sourceTree = "<group>";
@@ -217,9 +238,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		FF31E3BB271A57930060BFFB /* GradeKeeper */ = {
+		FF31E3BB271A57930060BFFB /* Courseman */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF31E3E6271A57950060BFFB /* Build configuration list for PBXNativeTarget "GradeKeeper" */;
+			buildConfigurationList = FF31E3E6271A57950060BFFB /* Build configuration list for PBXNativeTarget "Courseman" */;
 			buildPhases = (
 				FF31E3B8271A57930060BFFB /* Sources */,
 				FF31E3B9271A57930060BFFB /* Frameworks */,
@@ -229,14 +250,14 @@
 			);
 			dependencies = (
 			);
-			name = GradeKeeper;
+			name = Courseman;
 			productName = GradeKeeper;
-			productReference = FF31E3BC271A57930060BFFB /* GradeKeeper.app */;
+			productReference = FF31E3BC271A57930060BFFB /* Courseman.app */;
 			productType = "com.apple.product-type.application";
 		};
-		FF31E3D1271A57950060BFFB /* GradeKeeperTests */ = {
+		FF31E3D1271A57950060BFFB /* CoursemanTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF31E3E9271A57950060BFFB /* Build configuration list for PBXNativeTarget "GradeKeeperTests" */;
+			buildConfigurationList = FF31E3E9271A57950060BFFB /* Build configuration list for PBXNativeTarget "CoursemanTests" */;
 			buildPhases = (
 				FF31E3CE271A57950060BFFB /* Sources */,
 				FF31E3CF271A57950060BFFB /* Frameworks */,
@@ -247,14 +268,14 @@
 			dependencies = (
 				FF31E3D4271A57950060BFFB /* PBXTargetDependency */,
 			);
-			name = GradeKeeperTests;
+			name = CoursemanTests;
 			productName = GradeKeeperTests;
-			productReference = FF31E3D2271A57950060BFFB /* GradeKeeperTests.xctest */;
+			productReference = FF31E3D2271A57950060BFFB /* CoursemanTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		FF31E3DC271A57950060BFFB /* GradeKeeperUITests */ = {
+		FF31E3DC271A57950060BFFB /* CoursemanUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF31E3EC271A57950060BFFB /* Build configuration list for PBXNativeTarget "GradeKeeperUITests" */;
+			buildConfigurationList = FF31E3EC271A57950060BFFB /* Build configuration list for PBXNativeTarget "CoursemanUITests" */;
 			buildPhases = (
 				FF31E3D9271A57950060BFFB /* Sources */,
 				FF31E3DA271A57950060BFFB /* Frameworks */,
@@ -265,9 +286,9 @@
 			dependencies = (
 				FF31E3DF271A57950060BFFB /* PBXTargetDependency */,
 			);
-			name = GradeKeeperUITests;
+			name = CoursemanUITests;
 			productName = GradeKeeperUITests;
-			productReference = FF31E3DD271A57950060BFFB /* GradeKeeperUITests.xctest */;
+			productReference = FF31E3DD271A57950060BFFB /* CoursemanUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -293,7 +314,7 @@
 					};
 				};
 			};
-			buildConfigurationList = FF31E3B7271A57930060BFFB /* Build configuration list for PBXProject "GradeKeeper" */;
+			buildConfigurationList = FF31E3B7271A57930060BFFB /* Build configuration list for PBXProject "Courseman" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -306,9 +327,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				FF31E3BB271A57930060BFFB /* GradeKeeper */,
-				FF31E3D1271A57950060BFFB /* GradeKeeperTests */,
-				FF31E3DC271A57950060BFFB /* GradeKeeperUITests */,
+				FF31E3BB271A57930060BFFB /* Courseman */,
+				FF31E3D1271A57950060BFFB /* CoursemanTests */,
+				FF31E3DC271A57950060BFFB /* CoursemanUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -350,23 +371,30 @@
 				FF5E6E9E2731C991006F895E /* CreateCategoryTableViewController.swift in Sources */,
 				FF67D71C272B05BF00E847A2 /* LoginViewController.swift in Sources */,
 				FFC14703276FEB5900417299 /* CreateCourseTableViewController.swift in Sources */,
+				FFCCDCAD27AF206800E8C6CD /* SelectTermTableViewController.swift in Sources */,
 				FFC146C0276EE5FD00417299 /* GKStructures.swift in Sources */,
 				FFC146C2276EE65000417299 /* GKCalls.swift in Sources */,
+				FF22669027CAB1D90008CAD8 /* CategorySummaryTableViewCell.swift in Sources */,
+				FFCCDCAF27AF81EE00E8C6CD /* CreateTermTableViewController.swift in Sources */,
 				FF5E6E9A27304467006F895E /* SplitViewController.swift in Sources */,
 				FFC6855D272A3F8D00CDFE99 /* MainTableViewController.swift in Sources */,
 				FF5E6EA027363ED9006F895E /* ViewAssignmentTableViewController.swift in Sources */,
 				FF67D71E272B1A5A00E847A2 /* CourseListTableViewCell.swift in Sources */,
 				FFC6855F272A3FB900CDFE99 /* GradeKeeper.swift in Sources */,
 				FF67D720272B1D1D00E847A2 /* AssignmentTableViewCell.swift in Sources */,
+				FF2CB21827C2BD88007C1DE7 /* CourseSelectionTableViewCell.swift in Sources */,
 				FF31E3C4271A57930060BFFB /* ViewController.swift in Sources */,
+				FF22668E27C7E5300008CAD8 /* OverallGradeTableViewCell.swift in Sources */,
 				FFC1470D2770342800417299 /* GradeScaleTableViewCell.swift in Sources */,
 				FF31E3C0271A57930060BFFB /* AppDelegate.swift in Sources */,
 				FF67D722272B1F5700E847A2 /* ViewCourseTableViewController.swift in Sources */,
 				FFC14705277033B500417299 /* EditGradeTableViewController.swift in Sources */,
+				FF2CB21627C2B8B2007C1DE7 /* TermHeaderTableViewCell.swift in Sources */,
 				FFC1470F2770455800417299 /* ViewCourseDetailsTableViewController.swift in Sources */,
 				FF31E3C2271A57930060BFFB /* SceneDelegate.swift in Sources */,
 				FFC14709277033EF00417299 /* ViewCategoriesTableViewController.swift in Sources */,
 				FFC1470B2770340000417299 /* ViewGradeScaleTableViewController.swift in Sources */,
+				FFFCC8B727C311E800110E93 /* ViewTermTableViewController.swift in Sources */,
 				FF5E6E9C27306438006F895E /* SelectCategoryTableViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -392,12 +420,12 @@
 /* Begin PBXTargetDependency section */
 		FF31E3D4271A57950060BFFB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FF31E3BB271A57930060BFFB /* GradeKeeper */;
+			target = FF31E3BB271A57930060BFFB /* Courseman */;
 			targetProxy = FF31E3D3271A57950060BFFB /* PBXContainerItemProxy */;
 		};
 		FF31E3DF271A57950060BFFB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = FF31E3BB271A57930060BFFB /* GradeKeeper */;
+			target = FF31E3BB271A57930060BFFB /* Courseman */;
 			targetProxy = FF31E3DE271A57950060BFFB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -554,7 +582,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.noahsadir.GradeKeeper;
+				PRODUCT_BUNDLE_IDENTIFIER = io.noahsadir.courseman;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -579,7 +607,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.noahsadir.GradeKeeper;
+				PRODUCT_BUNDLE_IDENTIFIER = io.noahsadir.courseman;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
@@ -605,7 +633,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GradeKeeper.app/GradeKeeper";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Courseman.app/Courseman";
 			};
 			name = Debug;
 		};
@@ -627,7 +655,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/GradeKeeper.app/GradeKeeper";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Courseman.app/Courseman";
 			};
 			name = Release;
 		};
@@ -674,7 +702,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FF31E3B7271A57930060BFFB /* Build configuration list for PBXProject "GradeKeeper" */ = {
+		FF31E3B7271A57930060BFFB /* Build configuration list for PBXProject "Courseman" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FF31E3E4271A57950060BFFB /* Debug */,
@@ -683,7 +711,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF31E3E6271A57950060BFFB /* Build configuration list for PBXNativeTarget "GradeKeeper" */ = {
+		FF31E3E6271A57950060BFFB /* Build configuration list for PBXNativeTarget "Courseman" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FF31E3E7271A57950060BFFB /* Debug */,
@@ -692,7 +720,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF31E3E9271A57950060BFFB /* Build configuration list for PBXNativeTarget "GradeKeeperTests" */ = {
+		FF31E3E9271A57950060BFFB /* Build configuration list for PBXNativeTarget "CoursemanTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FF31E3EA271A57950060BFFB /* Debug */,
@@ -701,7 +729,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF31E3EC271A57950060BFFB /* Build configuration list for PBXNativeTarget "GradeKeeperUITests" */ = {
+		FF31E3EC271A57950060BFFB /* Build configuration list for PBXNativeTarget "CoursemanUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FF31E3ED271A57950060BFFB /* Debug */,

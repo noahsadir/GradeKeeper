@@ -1,16 +1,40 @@
-//
 //  ViewCategoriesTableViewController.swift
-//  GradeKeeper
-//
-//  Created by Noah Sadir on 12/19/21.
-//
+/*
+ Copyright (c) 2021-2022 Noah Sadir
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import UIKit
 
 class ViewCategoriesTableViewController: UITableViewController {
 
+    var selectedCourse: Course?
+    var categoryIDs = [String]()
+    
+    static var selectedCategoryID: String?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.tableView.tintColor = GradeKeeper.themeColor
+        self.navigationController?.navigationBar.tintColor = GradeKeeper.themeColor
+        loadCategories()
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -19,28 +43,81 @@ class ViewCategoriesTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
 
+    @IBAction func addCategoryButtonClicked(_ sender: Any) {
+        ViewCategoriesTableViewController.selectedCategoryID = nil
+        performSegue(withIdentifier: "editCategory", sender: nil)
+    }
+    
+    func loadCategories() {
+        categoryIDs = [String]()
+        selectedCourse = GradeKeeper.currentUser.courses[GradeKeeper.selectedCourseID]
+        if let selectedCourse = selectedCourse {
+            for category in selectedCourse.categories {
+                categoryIDs.append(category.key)
+                categoryIDs = categoryIDs.sorted { (first, second) -> Bool in
+                    if let firstCat = selectedCourse.categories[first], let secondCat = selectedCourse.categories[second] {
+                        return firstCat.weight < secondCat.weight
+                    }
+                    return first < second
+                }
+            }
+        }
+    }
+    
+    @IBAction func cancelCategoryEditUnwind(unwindSegue: UIStoryboardSegue) {
+    }
+    
+    @IBAction func finishCategoryEditUnwind(unwindSegue: UIStoryboardSegue) {
+        loadCategories()
+        tableView.reloadData()
+    }
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        return "Select category to edit"
+    }
+    
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return categoryIDs.count
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 60
     }
 
-    /*
+    /**/
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
+        let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath)
+        
+        if let selectedCourse = selectedCourse {
+            if let category = selectedCourse.categories[categoryIDs[indexPath.row]] {
+                cell.textLabel?.text = category.name
+                cell.detailTextLabel?.text = "Weight: " + String(Double(category.weight))
+            }
+        }
         // Configure the cell...
 
         return cell
     }
-    */
+    /**/
 
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        ViewCategoriesTableViewController.selectedCategoryID = categoryIDs[indexPath.row]
+        performSegue(withIdentifier: "editCategory", sender: nil)
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 40
+    }
+    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

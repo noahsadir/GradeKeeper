@@ -1,9 +1,24 @@
-//
 //  AssignmentTableViewController.swift
-//  GradeKeeper
-//
-//  Created by Noah Sadir on 10/28/21.
-//
+/*
+ Copyright (c) 2021-2022 Noah Sadir
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
 
 import UIKit
 
@@ -19,7 +34,6 @@ class ViewCourseTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
         self.tableView.delegate = self
         self.tableView.tintColor = GradeKeeper.themeColor
         self.navigationController?.navigationBar.tintColor = GradeKeeper.themeColor
@@ -29,6 +43,9 @@ class ViewCourseTableViewController: UITableViewController {
             self.selectedCourse = course
             self.loadAssignments()
         } else {
+            self.title = ""
+            self.addAssignmentButton.isEnabled = false
+            self.classSettingsButton.isEnabled = false
             self.removeFromParent()
             print("error retrieving class")
         }
@@ -49,7 +66,7 @@ class ViewCourseTableViewController: UITableViewController {
         
         // Ensure selected class exists
         if let _ = selectedCourse {
-            selectedCourse = GradeKeeper.calculate().sortAssignments(course: selectedCourse!)
+            selectedCourse = GradeKeeper.assignments().sorted(course: selectedCourse!)
             
             // only include categories which contain assignments
             for categoryItem in selectedCourse!.categories {
@@ -96,13 +113,21 @@ class ViewCourseTableViewController: UITableViewController {
     }
         
     @IBAction func addButtonClicked(_ sender: Any) {
-        GradeKeeper.selectedAssignmentID = ""
-        GradeKeeper.selectedCategoryID = ""
-        performSegue(withIdentifier: "createAssignmentSegue", sender: nil)
+        if let selectedCourse = selectedCourse {
+            if selectedCourse.categories.count == 0 {
+                
+            } else {
+                GradeKeeper.selectedAssignmentID = ""
+                GradeKeeper.selectedCategoryID = ""
+                performSegue(withIdentifier: "createAssignmentSegue", sender: nil)
+            }
+        }
     }
     
     @IBAction func courseDetailsUnwind(unwindSegue: UIStoryboardSegue) {
-        
+        if let selectedCourse = selectedCourse {
+            loadAssignments()
+        }
     }
     
     @IBAction func cancelEditAssignmentUnwind(unwindSegue: UIStoryboardSegue) {
@@ -198,99 +223,125 @@ class ViewCourseTableViewController: UITableViewController {
         return "--%"
     }
     
+    func overallGradeCell(_ tableView: UITableView, _ indexPath: IndexPath, _ selectedCourse: Course) -> OverallGradeTableViewCell {
+        let overallGradeCell = tableView.dequeueReusableCell(withIdentifier: "overallGradeCell", for: indexPath) as! OverallGradeTableViewCell
+        
+        overallGradeCell.gradeTitle.text = "Course Grade"
+        let courseScore = calculateScoreFor(course: selectedCourse)
+        
+        if courseScore[1] != 0 {
+            if selectedCourse.gradeScale.count == 0 {
+                overallGradeCell.gradeLabel.text = getPercentage(courseScore[0], courseScore[1])
+            } else {
+                overallGradeCell.gradeLabel.text = GradeKeeper.calculate().grade(adjPercent: (courseScore[0] / courseScore[1]) * 100, gradeScale: selectedCourse.gradeScale)
+            }
+        } else {
+            overallGradeCell.gradeLabel.text = "--"
+        }
+        
+        return overallGradeCell
+    }
+    
+    func categorySummaryCell(_ tableView: UITableView, _ indexPath: IndexPath, _ selectedCourse: Course) -> CategorySummaryTableViewCell {
+        let summaryCell = tableView.dequeueReusableCell(withIdentifier: "categorySummaryCell", for: indexPath) as! CategorySummaryTableViewCell
+        
+        if indexPath.row == 1 {
+            summaryCell.titleLabel?.text = "Overall"
+            var courseScore = calculateScoreFor(course: selectedCourse)
+            courseScore[0] = (courseScore[0] * 100).rounded() / 100
+            summaryCell.scoreLabel?.text = String(courseScore[0]) + " / " + String(courseScore[1])
+            summaryCell.percentageLabel.text = getPercentage(courseScore[0], courseScore[1])
+        } else {
+            
+            if let category = selectedCourse.categories[allCategoryIDs[indexPath.row - 2]] {
+                summaryCell.titleLabel?.text = category.name
+                
+                var catScore = calculateScoreFor(category: category)
+                
+                if let catScore = catScore {
+                    summaryCell.scoreLabel?.text = String((catScore * 100).rounded() / 100) + " / " + String(category.weight)
+                    summaryCell.percentageLabel.text = getPercentage(catScore, category.weight)
+                } else {
+                    summaryCell.scoreLabel?.text = "-- / " + String(category.weight)
+                }
+                
+            }
+        }
+        
+        return summaryCell
+    }
+    
+    func assignmentCell(_ tableView: UITableView, _ indexPath: IndexPath, _ category: Category) -> AssignmentTableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "assignmentCell", for: indexPath) as! AssignmentTableViewCell
+        if let assignmentItem = GradeKeeper.currentUser.assignments[category.assignmentIDs[indexPath.row]] {
+            
+            if assignmentItem.weight == 0 {
+                cell.assignmentTitle.textColor = .secondaryLabel
+                cell.gradeLabel.textColor = .secondaryLabel
+            } else {
+                cell.assignmentTitle.textColor = .label
+                cell.gradeLabel.textColor = .label
+            }
+            
+            cell.assignmentTitle.text = assignmentItem.title
+            
+            if let actScore = assignmentItem.actScore, let maxScore = assignmentItem.maxScore {
+                if assignmentItem.weight == 0 {
+                    cell.rawScoreLabel.text = String(actScore) + " / " + String(maxScore) + " (Dropped)"
+                } else {
+                    cell.rawScoreLabel.text = String(actScore) + " / " + String(maxScore) + " (x" + String(assignmentItem.weight) + ")"
+                }
+                cell.gradeLabel.text = String(Int((actScore / maxScore) * 100)) + "%"
+            } else {
+                cell.rawScoreLabel.text = "Awaiting score"
+                cell.gradeLabel.text = "-- %"
+            }
+            
+            if let dueDateSecs = assignmentItem.dueDate {
+                let dueDate = Date(timeIntervalSince1970: TimeInterval(dueDateSecs))
+                let dateFormatterPrint = DateFormatter()
+                dateFormatterPrint.dateFormat = "MMM dd, yyyy h:mm a"
+                
+                cell.dueDateLabel.text = dateFormatterPrint.string(from: dueDate)
+            } else {
+                cell.dueDateLabel.text = "(No due date)"
+            }
+            
+        } else {
+            print("asg error")
+        }
+         
+        return cell
+    }
+    
     /**/
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let placeholderCell = UITableViewCell()
-            
+        
         if let selectedCourse = selectedCourse {
-            
             if indexPath.section == 0 {
-                
-                let summaryCell = tableView.dequeueReusableCell(withIdentifier: "basicRightDetail", for: indexPath) as! UITableViewCell
-                
                 if indexPath.row == 0 {
-                    summaryCell.textLabel?.text = "Grade"
-                    var courseScore = calculateScoreFor(course: selectedCourse)
-                    if courseScore[1] != 0 {
-                        summaryCell.detailTextLabel?.text = GradeKeeper.calculate().grade(adjPercent: (courseScore[0] / courseScore[1]) * 100, gradeScale: selectedCourse.gradeScale)
-                    } else {
-                        summaryCell.detailTextLabel?.text = ""
-                    }
-                    
-                } else if indexPath.row == 1 {
-                    summaryCell.textLabel?.text = "Overall"
-                    var courseScore = calculateScoreFor(course: selectedCourse)
-                    courseScore[0] = (courseScore[0] * 100).rounded() / 100
-                    summaryCell.detailTextLabel?.text = String(courseScore[0]) + " / " + String(courseScore[1]) + " (" + getPercentage(courseScore[0], courseScore[1]) + ")"
+                    return overallGradeCell(tableView, indexPath, selectedCourse)
                 } else {
-                    
-                    if let category = selectedCourse.categories[allCategoryIDs[indexPath.row - 2]] {
-                        summaryCell.textLabel?.text = category.name
-                        
-                        var catScore = calculateScoreFor(category: category)
-                        
-                        if let catScore = catScore {
-                            summaryCell.detailTextLabel?.text = String((catScore * 100).rounded() / 100) + " / " + String(category.weight) + " (" + getPercentage(catScore, category.weight) + ")"
-                        } else {
-                            summaryCell.detailTextLabel?.text = "-- / " + String(category.weight)
-                        }
-                        
-                    }
+                    return categorySummaryCell(tableView, indexPath, selectedCourse)
                 }
-                
-                return summaryCell
-                
             } else if let category = selectedCourse.categories[categoryIDs[indexPath.section - 1]] {
-                let cell = tableView.dequeueReusableCell(withIdentifier: "assignmentCell", for: indexPath) as! AssignmentTableViewCell
-                if let assignmentItem = GradeKeeper.currentUser.assignments[category.assignmentIDs[indexPath.row]] {
-                    if assignmentItem.weight == 0 {
-                        cell.assignmentTitle.textColor = .secondaryLabel
-                        cell.gradeLabel.textColor = .secondaryLabel
-                    } else {
-                        cell.assignmentTitle.textColor = .label
-                        cell.gradeLabel.textColor = .label
-                    }
-                    cell.assignmentTitle.text = assignmentItem.title
-                    if let actScore = assignmentItem.actScore, let maxScore = assignmentItem.maxScore {
-                        if assignmentItem.weight == 0 {
-                            cell.rawScoreLabel.text = String(actScore) + " / " + String(maxScore) + " (Dropped)"
-                        } else {
-                            cell.rawScoreLabel.text = String(actScore) + " / " + String(maxScore) + " (x" + String(assignmentItem.weight) + ")"
-                        }
-                        cell.gradeLabel.text = String(Int((actScore / maxScore) * 100)) + "%"
-                    } else {
-                        cell.rawScoreLabel.text = "Awaiting score"
-                        cell.gradeLabel.text = "-- %"
-                    }
-                    
-                    if let dueDateSecs = assignmentItem.dueDate {
-                        let dueDate = Date(timeIntervalSince1970: TimeInterval(dueDateSecs))
-                        let dateFormatterPrint = DateFormatter()
-                        dateFormatterPrint.dateFormat = "MMM dd, yyyy h:mm a"
-                        
-                        cell.dueDateLabel.text = dateFormatterPrint.string(from: dueDate)
-                    } else {
-                        cell.dueDateLabel.text = "(No due date)"
-                    }
-                } else {
-                    print("asg error")
-                }
-                return cell
+                return assignmentCell(tableView, indexPath, category)
             } else {
                 print("cat error")
             }
         } else {
             print("cla error")
         }
-        
-        // Configure the cell...
 
-        return placeholderCell
+        return UITableViewCell()
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.section == 0 {
-            return 45
+            if (indexPath.row == 0) {
+                return 60
+            }
+            return 50
         }
         
         return 80
@@ -310,6 +361,11 @@ class ViewCourseTableViewController: UITableViewController {
             
         }
     }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 40
+    }
+    
     /**/
 
     /*

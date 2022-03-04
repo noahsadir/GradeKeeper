@@ -1,9 +1,26 @@
-//
 //  GradeKeeper.swift
-//  GradeKeeper
-//
-//  Created by Noah Sadir on 10/27/21.
-//
+/*
+ Copyright (c) 2021-2022 Noah Sadir
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+// (This is where the magic happens)
 
 import Foundation
 import UIKit
@@ -14,12 +31,14 @@ class GradeKeeper {
     var baseURL = "https://gradekeeper.noahsadir.io/api/"
     var urlSuffix = ""
     
-    
-    static var currentUser = User()
+    static var currentUser = User(email: "", password: "", dictionary: [:])
+    //static var currentUser = User()
     static var selectedCourseID = ""
     static var selectedAssignmentID = ""
     static var selectedCategoryID = ""
-    static var themeColor = UIColor.systemPurple
+    static var selectedTermID = ""
+    static var themeColor = UIColor.systemIndigo
+
     
     class user: GradeKeeper {
         
@@ -31,8 +50,8 @@ class GradeKeeper {
         ///     if (success) {
         ///         // handle success
         ///     } else {
-        ///         print(error.id)
-        ///         print(error.message)
+        ///         print(error!.id)
+        ///         print(error!.message)
         ///     }
         /// }
         /// ```
@@ -59,8 +78,8 @@ class GradeKeeper {
         ///     if (success) {
         ///         // handle success
         ///     } else {
-        ///         print(error.id)
-        ///         print(error.message)
+        ///         print(error!.id)
+        ///         print(error!.message)
         ///     }
         /// }
         /// ```
@@ -100,8 +119,8 @@ class GradeKeeper {
         ///     if (success) {
         ///         // handle success
         ///     } else {
-        ///         print(error.id)
-        ///         print(error.message)
+        ///         print(error!.id)
+        ///         print(error!.message)
         ///     }
         /// }
         /// ```
@@ -135,6 +154,28 @@ class GradeKeeper {
             }
         }
         
+        /// Modify an existing category
+        ///
+        /// Example of a typical implementation
+        /// ```
+        /// GradeKeeper.category().modify(courseID: "0123456789abcdef", categoryID: "0123456789abcdef", categoryName: "Homework", weight: 25, dropCount: 3) { (success, error) in
+        ///     if (success) {
+        ///         // handle success
+        ///     } else {
+        ///         print(error!.id)
+        ///         print(error!.message)
+        ///     }
+        /// }
+        /// ```
+        ///
+        /// - Parameters:
+        ///     - email: The desired email for the new user
+        ///     - password: The desired password for the new user
+        ///     - callback: The closure which is called after the request is completed
+        ///         - `success` Indicates whether or not request was successful
+        ///         - `error` Contains the error ID and human-friendly message if the request fails.
+        ///
+        ///        *NOTE:* If the request was successful, `error == nil`
         func modify(courseID: String, categoryID: String, categoryName: String, weight: Double, dropCount: Int, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
             if GradeKeeper.currentUser.isLocal {
                 if let course = GradeKeeper.currentUser.courses[courseID] {
@@ -187,6 +228,22 @@ class GradeKeeper {
                 }
             }
         }
+        
+        func sorted(course: Course) -> [String] {
+            var categoryIDs = Array(course.categories.keys) as [String]
+            
+            // sort categories
+            categoryIDs = categoryIDs.sorted { (first, second) -> Bool in
+                if let firstCat = course.categories[first], let secondCat = course.categories[second] {
+                    if firstCat.weight != secondCat.weight {
+                        return firstCat.weight < secondCat.weight
+                    }
+                    return firstCat.name < secondCat.name
+                }
+                return first < second
+            }
+            return categoryIDs
+        }
     }
     
     class grade: GradeKeeper {
@@ -231,6 +288,31 @@ class GradeKeeper {
                 }
             } else {
                 GKCalls().modifyGrade(&GradeKeeper.currentUser, courseID: courseID, gradeID: gradeID, minScore: minScore, maxScore: maxScore, credit: credit) { (success, result, error) in
+                    if success {
+                        GradeKeeper.courses().load() { (loadSuccess, loadErr) in
+                            callback(loadSuccess, loadErr)
+                        }
+                    } else {
+                        callback(success, error)
+                    }
+                }
+            }
+        }
+        
+        func delete(courseID: String, gradeID: String, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
+            if GradeKeeper.currentUser.isLocal {
+                if let course = GradeKeeper.currentUser.courses[courseID] {
+                    if let _ = course.gradeScale[gradeID] {
+                        GradeKeeper.currentUser.courses[courseID]!.gradeScale.removeValue(forKey: gradeID)
+                        callback(true, nil)
+                    } else {
+                        callback(false, APIError(id: "LOC_ERR_INVALID_GRADE", message: "The specified grade does not exist.", code: 400))
+                    }
+                } else {
+                    callback(false, APIError(id: "LOC_ERR_INVALID_COURSE", message: "The specified course does not exist.", code: 400))
+                }
+            } else {
+                GKCalls().deleteGrade(&GradeKeeper.currentUser, courseID: courseID, gradeID: gradeID) { (success, result, error) in
                     if success {
                         GradeKeeper.courses().load() { (loadSuccess, loadErr) in
                             callback(loadSuccess, loadErr)
@@ -325,8 +407,14 @@ class GradeKeeper {
             } else {
                 GKCalls().modifyAssignment(&GradeKeeper.currentUser, courseID: courseID, categoryID: categoryID, assignmentID: assignmentID, title: title, description: description, gradeID: gradeID, actScore: actScore, maxScore: maxScore, weight: weight, penalty: penalty, dueDate: dueDate, assignDate: assignDate, gradedDate: gradedDate) { (success, result, error) in
                     if success {
-                        GradeKeeper.assignments().load(courseID: courseID) { (asgSuccess, asgErr) in
-                            callback(asgSuccess, asgErr)
+                        GradeKeeper.courses().load() { (crsSuccess, crsErr) in
+                            if crsSuccess {
+                                GradeKeeper.assignments().load(courseID: courseID) { (asgSuccess, asgErr) in
+                                    callback(asgSuccess, asgErr)
+                                }
+                            } else {
+                                callback(crsSuccess, crsErr)
+                            }
                         }
                     } else {
                         callback(success, error)
@@ -364,6 +452,31 @@ class GradeKeeper {
                 }
             }
         }
+        
+        func sorted(course: Course) -> Course {
+            var newCourse = course
+            let sortedAssignments = GradeKeeper.currentUser.assignments.sorted { (first, second) -> Bool in
+                let firstDue = first.value.dueDate ?? 0
+                let secondDue = second.value.dueDate ?? 0
+                if firstDue != secondDue {
+                    return firstDue < secondDue
+                }
+                return first.value.title < second.value.title
+            }
+            
+            for categoryItem in newCourse.categories {
+                var orderedAssignments = [String]()
+                for assignmentItem in sortedAssignments {
+                    if categoryItem.value.assignmentIDs.contains(assignmentItem.key) {
+                        orderedAssignments.append(assignmentItem.key)
+                    }
+                }
+                newCourse.categories[categoryItem.key]!.assignmentIDs = orderedAssignments
+            }
+            return newCourse
+        }
+        
+        
     }
     
     class courses: GradeKeeper {
@@ -376,6 +489,133 @@ class GradeKeeper {
                     if success {
                         if let gradebook = result!["gradebook"] as? [String: Any] {
                             GradeKeeper.currentUser.courses = GradeKeeper.currentUser.configClasses(dictionary: gradebook)
+                            GradeKeeper.terms().load() { (trmSuccess, trmError) in
+                                callback(trmSuccess, trmError)
+                            }
+                        } else {
+                            callback(false, APIError())
+                        }
+                    } else {
+                        callback(success, error)
+                    }
+                }
+            }
+        }
+        
+        func create(termID: String?, courseName: String, courseCode: String?, color: Int?, weight: Double?, instructor: String?, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
+            if GradeKeeper.currentUser.isLocal {
+                let courseID = "localcrs_" + String(Date().timeIntervalSince1970);
+                if let _ = GradeKeeper.currentUser.courses[courseID] {
+                    callback(false, APIError(id: "LOC_ERR_COURSE_EXISTS", message: "The course already exists.", code: 400))
+                } else {
+                    GradeKeeper.currentUser.courses[courseID] = Course(courseName: courseName, courseCode: courseCode, color: color, weight: weight)
+                    callback(true, nil)
+                }
+                
+            } else {
+                GKCalls().createCourse(&GradeKeeper.currentUser, termID: termID, courseName: courseName, courseCode: courseCode, color: color, weight: weight, instructor: instructor) { (success, result, error) in
+                    if success {
+                        GradeKeeper.courses().load() { (crsSuccess, crsErr) in
+                            if crsSuccess {
+                                GradeKeeper.terms().load() { (trmSuccess, trmErr) in
+                                    callback(trmSuccess, trmErr)
+                                }
+                            } else {
+                                callback(crsSuccess, crsErr)
+                            }
+                        }
+                    } else {
+                        callback(success, error)
+                    }
+                }
+            }
+        }
+        
+        func modify(courseID: String, termID: String?, courseName: String, courseCode: String?, color: Int?, weight: Double?, instructor: String?, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
+            if GradeKeeper.currentUser.isLocal {
+                if let _ = GradeKeeper.currentUser.courses[courseID] {
+                    GradeKeeper.currentUser.courses[courseID]!.courseName = courseName
+                    GradeKeeper.currentUser.courses[courseID]!.courseCode = courseCode
+                    GradeKeeper.currentUser.courses[courseID]!.color = color ?? 0
+                    GradeKeeper.currentUser.courses[courseID]!.weight = weight ?? 1
+                    callback(true, nil)
+                } else {
+                    callback(false, APIError(id: "LOC_ERR_INVALID_COURSE", message: "The specified course does not exist.", code: 400))
+                }
+            } else {
+                GKCalls().modifyCourse(&GradeKeeper.currentUser, courseID: courseID, termID: termID, courseName: courseName, courseCode: courseCode, color: color, weight: weight, instructor: instructor) { (success, result, error) in
+                    if success {
+                        GradeKeeper.courses().load() { (crsSuccess, crsErr) in
+                            if crsSuccess {
+                                GradeKeeper.terms().load() { (trmSuccess, trmErr) in
+                                    callback(trmSuccess, trmErr)
+                                }
+                            } else {
+                                callback(crsSuccess, crsErr)
+                            }
+                        }
+                    } else {
+                        callback(success, error)
+                    }
+                }
+            }
+        }
+        
+        func delete(courseID: String, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
+            if GradeKeeper.currentUser.isLocal {
+                if let _ = GradeKeeper.currentUser.courses[courseID] {
+                    GradeKeeper.currentUser.courses.removeValue(forKey: courseID)
+                    callback(true, nil)
+                } else {
+                    callback(false, APIError(id: "LOC_ERR_INVALID_COURSE", message: "The specified course does not exist.", code: 400))
+                }
+            } else {
+                GKCalls().deleteCourse(&GradeKeeper.currentUser, courseID: courseID) { (success, result, error) in
+                    if success {
+                        GradeKeeper.courses().load() { (crsSuccess, crsErr) in
+                            if crsSuccess {
+                                GradeKeeper.terms().load() { (trmSuccess, trmErr) in
+                                    callback(trmSuccess, trmErr)
+                                }
+                            } else {
+                                callback(crsSuccess, crsErr)
+                            }
+                        }
+                    } else {
+                        callback(success, error)
+                    }
+                }
+            }
+        }
+        
+        func sorted(courses: [String: Course]) -> [String] {
+            var courseIDs = Array(courses.keys) as [String]
+            // sort categories
+            courseIDs = courseIDs.sorted { (first, second) -> Bool in
+                if let firstCourse = courses[first], let secondCourse = courses[second] {
+                    if let firstCode = firstCourse.courseCode, let secondCode = secondCourse.courseCode {
+                        return firstCode < secondCode
+                    }
+                    return firstCourse.courseName < secondCourse.courseName
+                }
+                return first < second
+            }
+            return courseIDs
+        }
+        
+    }
+    
+    class terms: GradeKeeper {
+        
+        func load(callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
+            if GradeKeeper.currentUser.isLocal {
+                callback(true, nil)
+            } else {
+                GKCalls().getTerms(&GradeKeeper.currentUser) { (success, result, error) in
+                    if success {
+                        if let terms = result!["terms"] as? [String: Any] {
+                            
+                            GradeKeeper.currentUser.terms = GradeKeeper.currentUser.configTerms(dictionary: terms)
                             callback(true, nil)
                         } else {
                             callback(false, APIError())
@@ -387,39 +627,109 @@ class GradeKeeper {
             }
         }
         
-        func create(courseName: String, courseCode: String?, color: Int?, weight: Double?, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
+        func create(termTitle: String, startDate: UInt64?, endDate: UInt64?, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
             if GradeKeeper.currentUser.isLocal {
-                let courseID = "localcrs_" + String(Date().timeIntervalSince1970);
-                if let _ = GradeKeeper.currentUser.courses[courseID] {
-                    callback(false, APIError(id: "LOC_ERR_COURSE_EXISTS", message: "The course already exists.", code: 400))
+                let termID = "localtrm_" + String(Date().timeIntervalSince1970);
+                if let _ = GradeKeeper.currentUser.terms[termID] {
+                    callback(false, APIError(id: "LOC_ERR_TERM_EXISTS", message: "The term already exists.", code: 400))
                 } else {
-                    GradeKeeper.currentUser.courses[courseID] = Course(courseName: courseName, courseCode: courseCode, color: color, weight: weight)
+                    GradeKeeper.currentUser.terms[termID] = Term(title: termTitle, startDate: startDate, endDate: endDate)
                     callback(true, nil)
                 }
-                
             } else {
-                GKCalls().createCourse(&GradeKeeper.currentUser, courseName: courseName, courseCode: courseCode, color: color, weight: weight) { (success, result, error) in
-                    callback(success, error)
+                GKCalls().createTerm(&GradeKeeper.currentUser, termTitle: termTitle, startDate: startDate, endDate: endDate) { (success, result, error) in
+                    if success {
+                        GradeKeeper.terms().load() { (trmSuccess, trmErr) in
+                            callback(trmSuccess, trmErr)
+                        }
+                    } else {
+                        callback(success, error)
+                    }
                 }
             }
         }
         
-        func modify(courseID: String, courseName: String, courseCode: String, color: Int?, weight: Double?, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
+        func modify(termID: String, termTitle: String, startDate: UInt64?, endDate: UInt64?, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
             if GradeKeeper.currentUser.isLocal {
-                if let _ = GradeKeeper.currentUser.courses[courseID] {
-                    GradeKeeper.currentUser.courses[courseID] = Course(courseName: courseName, courseCode: courseCode, color: color, weight: weight)
+                if let _ = GradeKeeper.currentUser.terms[termID] {
+                    GradeKeeper.currentUser.terms[termID]!.title = termTitle
+                    GradeKeeper.currentUser.terms[termID]!.startDate = startDate
+                    GradeKeeper.currentUser.terms[termID]!.endDate = endDate
                     callback(true, nil)
                 } else {
-                    callback(false, APIError(id: "LOC_ERR_INVALID_COURSE", message: "The specified course does not exist.", code: 400))
+                    callback(false, APIError(id: "LOC_ERR_INVALID_TERM", message: "The term does not exist.", code: 400))
                 }
             } else {
-                GKCalls().modifyCourse(&GradeKeeper.currentUser, courseID: courseID, courseName: courseName, courseCode: courseCode, color: color, weight: weight) { (success, result, error) in
-                    callback(success, error)
+                GKCalls().modifyTerm(&GradeKeeper.currentUser, termID: termID, termTitle: termTitle, startDate: startDate, endDate: endDate) { (success, result, error) in
+                    if success {
+                        GradeKeeper.terms().load() { (trmSuccess, trmErr) in
+                            callback(trmSuccess, trmErr)
+                        }
+                    } else {
+                        callback(success, error)
+                    }
                 }
             }
+        }
+        
+        func delete(termID: String, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
+            if GradeKeeper.currentUser.isLocal {
+                if let _ = GradeKeeper.currentUser.terms[termID] {
+                    GradeKeeper.currentUser.terms.removeValue(forKey: termID)
+                    callback(true, nil)
+                } else {
+                    callback(false, APIError(id: "LOC_ERR_INVALID_TERM", message: "The term does not exist.", code: 400))
+                }
+            } else {
+                GKCalls().deleteTerm(&GradeKeeper.currentUser, termID: termID) { (success, result, error) in
+                    if success {
+                        GradeKeeper.terms().load() { (trmSuccess, trmErr) in
+                            callback(trmSuccess, trmErr)
+                        }
+                    } else {
+                        callback(success, error)
+                    }
+                }
+            }
+        }
+        
+        func sorted(terms: [String: Term]) -> [String] {
+            var termIDs = Array(terms.keys) as [String]
+            
+            // sort categories
+            termIDs = termIDs.sorted { (first, second) -> Bool in
+                if let firstTerm = terms[first], let secondTerm = terms[second] {
+                    if let firstStart = firstTerm.startDate, let secondStart = secondTerm.startDate {
+                        return firstStart > secondStart
+                    } else if let firstEnd = firstTerm.endDate, let secondEnd = secondTerm.endDate {
+                        return firstEnd > secondEnd
+                    }
+                }
+                return first < second
+            }
+            return termIDs
+        }
+        
+        func forCourseID(courseID: String) -> Term? {
+            for term in GradeKeeper.currentUser.terms {
+                if term.value.courseIDs.contains(courseID) {
+                    return term.value
+                }
+            }
+            return nil
+        }
+        
+        func idFromCourseID(courseID: String) -> String? {
+            for term in GradeKeeper.currentUser.terms {
+                if term.value.courseIDs.contains(courseID) {
+                    return term.key
+                }
+            }
+            return nil
         }
         
     }
+    
     
     class calculate: GradeKeeper {
         
@@ -525,56 +835,28 @@ class GradeKeeper {
             return dateFormatterPrint.string(from: dueDate)
         }
         
-        func sortAssignments(course: Course) -> Course {
-            var newCourse = course
-            let sortedAssignments = GradeKeeper.currentUser.assignments.sorted { (first, second) -> Bool in
-                let firstDue = first.value.dueDate ?? 0
-                let secondDue = second.value.dueDate ?? 0
-                if firstDue != secondDue {
-                    return firstDue < secondDue
-                }
-                return first.value.title < second.value.title
-            }
-            
-            for categoryItem in newCourse.categories {
-                var orderedAssignments = [String]()
-                for assignmentItem in sortedAssignments {
-                    if categoryItem.value.assignmentIDs.contains(assignmentItem.key) {
-                        orderedAssignments.append(assignmentItem.key)
-                    }
-                }
-                newCourse.categories[categoryItem.key]!.assignmentIDs = orderedAssignments
-            }
-            return newCourse
-        }
-        
-        func sortCategories(course: Course) -> [String] {
-            var categoryIDs = Array(course.categories.keys) as [String]
-            
-            // sort categories
-            categoryIDs = categoryIDs.sorted { (first, second) -> Bool in
-                if let firstCat = course.categories[first], let secondCat = course.categories[second] {
-                    if firstCat.weight != secondCat.weight {
-                        return firstCat.weight < secondCat.weight
-                    }
-                    return firstCat.name < secondCat.name
-                }
-                return first < second
-            }
-            return categoryIDs
-        }
-        
     }
+    
     
     class storage: GradeKeeper {
         
         class user: storage {
             func save() {
-                
+                let jsonEncoder = JSONEncoder()
+                let jsonData = try? jsonEncoder.encode(GradeKeeper.currentUser)
+                if let jsonData = jsonData {
+                    GradeKeeper.storage.documents().save(data: jsonData, name: "user", format: "json")
+                }
             }
             
             func load() {
-                
+                if let jsonData = GradeKeeper.storage.documents().load(path: "user.json") {
+                    let decoder = JSONDecoder()
+
+                    if let loadedUser = try? decoder.decode(User.self, from: jsonData) {
+                        GradeKeeper.currentUser = loadedUser
+                    }
+                }
             }
         }
         
@@ -587,13 +869,111 @@ class GradeKeeper {
                 return UserDefaults.standard.object(forKey: key)
             }
         }
+        
+        class documents: storage {
+            func save(data: Data, name: String, format: String) -> URL? {
+                let docDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                
+                let filePath = docDirectory.appendingPathComponent(name + "." + format)
+                
+                if FileManager.default.fileExists(atPath: filePath.path) {
+                    do {
+                        try? FileManager.default.removeItem(at: filePath)
+                    }
+                }
+                
+                do {
+                    try data.write(to: filePath)
+                    return filePath
+                } catch {
+                    return nil
+                }
+            }
+            
+            func load(path: String) -> Data? {
+                let docDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+                let filePath = docDirectory.appendingPathComponent(path)
+                
+                do {
+                    if let data = try? Data(contentsOf: filePath) {
+                        return data
+                    }
+                }
+                
+                return nil
+            }
+        }
+        
+        class appSupport: storage {
+            func save(data: Data, name: String, format: String) -> URL? {
+                let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                
+                let filePath = appSupportDirectory.appendingPathComponent(name + "." + format)
+                
+                if FileManager.default.fileExists(atPath: filePath.path) {
+                    do {
+                        try? FileManager.default.removeItem(at: filePath)
+                    }
+                }
+                
+                do {
+                    try data.write(to: filePath)
+                    return filePath
+                } catch {
+                    return nil
+                }
+            }
+            
+            func load(path: String) -> Data? {
+                let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                let filePath = appSupportDirectory.appendingPathComponent(path)
+                
+                do {
+                    if let data = try? Data(contentsOf: filePath) {
+                        return data
+                    }
+                }
+                
+                return nil
+            }
+        }
     }
     
     func userToJSON() {
         let jsonEncoder = JSONEncoder()
         let jsonData = try? jsonEncoder.encode(GradeKeeper.currentUser)
         if let jsonData = jsonData {
+            saveTempFile(data: jsonData, format: "json")
             print(String(data: jsonData, encoding: .utf8))
+        }
+        
+    }
+    
+    func saveTempFile(data: Data, format: String) -> URL? {
+        let appSupportDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        
+        let tempDirectory = appSupportDirectory.appendingPathComponent("tmp")
+        
+        //Create subdirectory if it doesn't exist
+        if !FileManager.default.fileExists(atPath: tempDirectory.path) {
+            do {
+                try? FileManager.default.createDirectory(at: tempDirectory, withIntermediateDirectories: true, attributes: nil)
+            }
+        }
+        
+        let filePath = tempDirectory.appendingPathComponent("File." + format)
+        
+        if FileManager.default.fileExists(atPath: filePath.path) {
+            do {
+                try? FileManager.default.removeItem(at: filePath)
+            }
+        }
+        
+        do {
+            try data.write(to: filePath)
+            return filePath
+        } catch {
+            return nil
         }
     }
     
@@ -624,6 +1004,55 @@ class GradeKeeper {
 
             vc.present(alert, animated: true)
         }
+    }
+    
+    func fieldNotice(_ vc: UIViewController, title: String, message: String) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            
+            alert.view.tintColor = GradeKeeper.themeColor
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+
+            vc.present(alert, animated: true)
+        }
+    }
+    
+    func actionDialog(_ vc: UIViewController, title: String, message: String, affirmTitle: String, allowsCancel: Bool, retryFunc: @escaping (_ action: UIAlertAction) -> Void) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: title, message: message , preferredStyle: .alert)
+            
+            alert.view.tintColor = GradeKeeper.themeColor
+            
+            alert.addAction(UIAlertAction(title: affirmTitle, style: .default, handler: retryFunc))
+            
+            if allowsCancel {
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            }
+
+            vc.present(alert, animated: true)
+        }
+    }
+    
+    func deleteDialog(_ vc: UIViewController, title: String, message: String, allowsCancel: Bool, retryFunc: @escaping (_ action: UIAlertAction) -> Void) {
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: title, message: message , preferredStyle: .alert)
+            
+            alert.view.tintColor = GradeKeeper.themeColor
+            
+            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: retryFunc))
+            
+            if allowsCancel {
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            }
+
+            vc.present(alert, animated: true)
+        }
+    }
+    
+    func tapToDismissKeyboard(_ view: UIView) {
+        let tapGesture = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
+        view.addGestureRecognizer(tapGesture)
     }
     
 }
