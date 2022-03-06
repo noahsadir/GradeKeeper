@@ -40,19 +40,15 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function deleteAssignment(con: any, req: any, res: any) {
+export function deleteAssignment(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
   var body: DeleteAssignmentArgs = req.body;
 
-  validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
+  validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
-      performAction(con, req, res, body, (paStatus: number, paOutput: Object) => {
-        res.statusCode = paStatus;
-        res.json(paOutput);
-      });
+      performAction(con, body, callback);
     } else {
-      res.statusCode = viStatus;
-      res.json(viOutput);
+      callback(viStatus, viOutput);
     }
   });
 
@@ -67,7 +63,7 @@ export function deleteAssignment(con: any, req: any, res: any) {
  * @param {any} res the Express result
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: DeleteAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
+function validateInput(con: any, body: DeleteAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
   if (body.internal_id != null && body.token != null && body.assignment_id != null && body.class_id != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
@@ -88,7 +84,7 @@ function validateInput(con: any, req: any, res: any, body: DeleteAssignmentArgs,
  * @param {any} res the Express result
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: DeleteAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: DeleteAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
   getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
       var delSql = "DELETE FROM items WHERE assignment_id = ?";

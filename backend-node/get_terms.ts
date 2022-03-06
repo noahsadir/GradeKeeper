@@ -38,19 +38,15 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function getTerms(con: any, req: any, res: any) {
+export function getTerms(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
   var body: GetTermsArgs = req.body;
 
-  validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
+  validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
-      performAction(con, req, res, body, (paStatus: number, paOutput: Object) => {
-        res.statusCode = paStatus;
-        res.json(paOutput);
-      });
+      performAction(con, body, callback);
     } else {
-      res.statusCode = viStatus;
-      res.json(viOutput);
+      callback(viStatus, viOutput);
     }
   });
 
@@ -65,7 +61,7 @@ export function getTerms(con: any, req: any, res: any) {
  * @param {any} res the Express result
  * @param {GetTermsArgs} body the arguments provided by the user
  */
- function validateInput(con: any, req: any, res: any, body: GetTermsArgs, callback: (statusCode: number, output: Object) => void) {
+ function validateInput(con: any, body: GetTermsArgs, callback: (statusCode: number, output: Object) => void) {
    if (body.internal_id != null && body.token != null) {
      verifyToken(con, body.internal_id, body.token, callback);
    } else {
@@ -77,7 +73,7 @@ export function getTerms(con: any, req: any, res: any) {
    }
  }
 
-function getCourseIDsForTermSequentially(con: any, req: any, res: any, termIDs: string[], current: number, terms: any, callback: (modifiedTerms: any, err: QueryError) => void) {
+function getCourseIDsForTermSequentially(con: any, termIDs: string[], current: number, terms: any, callback: (modifiedTerms: any, err: QueryError) => void) {
   var termID = termIDs[current];
   var sql: string = "SELECT class_id FROM classes WHERE term_id = ?";
   var args: [string] = [termID];
@@ -90,7 +86,7 @@ function getCourseIDsForTermSequentially(con: any, req: any, res: any, termIDs: 
         }
         terms[termID]["class_ids"] = courseIDs;
 
-        getCourseIDsForTermSequentially(con, req, res, termIDs, current + 1, terms, callback);
+        getCourseIDsForTermSequentially(con, termIDs, current + 1, terms, callback);
       } else {
         callback(terms, null);
       }
@@ -109,7 +105,7 @@ function getCourseIDsForTermSequentially(con: any, req: any, res: any, termIDs: 
  * @param {any} res the Express result
  * @param {GetTermsArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: GetTermsArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: GetTermsArgs, callback: (statusCode: number, output: Object) => void) {
   var sql: string = "SELECT * FROM terms WHERE internal_id = ?";
   var args: [string] = [body.internal_id];
   con.query(sql, args, (err: QueryError, res: any[]) => {
@@ -126,7 +122,7 @@ function performAction(con: any, req: any, res: any, body: GetTermsArgs, callbac
         termIDs.push(res[i].term_id);
       }
 
-      getCourseIDsForTermSequentially(con, req, res, termIDs, 0, terms, (modifiedTerms, crstrmErr) => {
+      getCourseIDsForTermSequentially(con, termIDs, 0, terms, (modifiedTerms, crstrmErr) => {
         if (!crstrmErr) {
           callback(200, {
             success: true,

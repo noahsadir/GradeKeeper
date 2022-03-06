@@ -245,3 +245,7 @@ export interface GetTermsArgs {
 export interface GetLogsArgs {
   api_key: string
 }
+
+export interface Gradebook {
+  classes: any;
+}

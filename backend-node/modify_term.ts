@@ -40,19 +40,15 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function modifyTerm(con: any, req: any, res: any) {
+export function modifyTerm(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
   var body: ModifyTermArgs = req.body;
 
-  validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
+  validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
-      performAction(con, req, res, body, (paStatus: number, paOutput: Object) => {
-        res.statusCode = paStatus;
-        res.json(paOutput);
-      });
+      performAction(con, body, callback);
     } else {
-      res.statusCode = viStatus;
-      res.json(viOutput);
+      callback(viStatus, viOutput);
     }
   });
 
@@ -67,7 +63,7 @@ export function modifyTerm(con: any, req: any, res: any) {
  * @param {any} res the Express result
  * @param {ModifyTermArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: ModifyTermArgs, callback: (statusCode: number, output: Object) => void) {
+function validateInput(con: any, body: ModifyTermArgs, callback: (statusCode: number, output: Object) => void) {
   if (body.internal_id != null && body.token != null && body.term_id != null && body.term_title != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
@@ -88,7 +84,7 @@ function validateInput(con: any, req: any, res: any, body: ModifyTermArgs, callb
  * @param {any} res the Express result
  * @param {ModifyTermArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: ModifyTermArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: ModifyTermArgs, callback: (statusCode: number, output: Object) => void) {
   var sql = "UPDATE terms SET `title` = ?, `start_date` = ?, `end_date` = ? WHERE `internal_id` = ? AND `term_id` = ?";
   var args: [string, number, number, string, string] = [body.term_title, body.start_date, body.end_date, body.internal_id, body.term_id];
 

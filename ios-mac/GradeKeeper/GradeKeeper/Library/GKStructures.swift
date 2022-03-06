@@ -65,6 +65,18 @@ struct Course: Codable {
             for timeslot in timeslots {
                 self.schedule.append(Timeslot(dictionary: timeslot))
             }
+            
+            // sort categories
+            self.schedule = self.schedule.sorted { (first, second) -> Bool in
+                if first.dayOfWeek != second.dayOfWeek {
+                    return first.dayOfWeek < second.dayOfWeek
+                } else if first.startTime != second.startTime {
+                    return first.startTime < second.startTime
+                } else if first.endTime != second.endTime {
+                    return first.endTime < second.endTime
+                }
+                return false
+            }
         }
     }
     

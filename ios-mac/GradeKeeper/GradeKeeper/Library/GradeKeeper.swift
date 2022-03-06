@@ -37,7 +37,9 @@ class GradeKeeper {
     static var selectedAssignmentID = ""
     static var selectedCategoryID = ""
     static var selectedTermID = ""
+    static var selectedTimeslotIndex = -1
     static var themeColor = UIColor.systemIndigo
+    
 
     
     class user: GradeKeeper {
@@ -330,6 +332,7 @@ class GradeKeeper {
         
         func load(courseID: String, callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
             if GradeKeeper.currentUser.isLocal {
+                GradeKeeper.storage.user().save()
                 callback(true, nil)
             } else {
                 GKCalls().getAssignments(&GradeKeeper.currentUser, courseID: courseID, ignoreBeforeDate: nil) { (success, result, error) in
@@ -339,6 +342,7 @@ class GradeKeeper {
                             for assignmentItem in assignments {
                                 GradeKeeper.currentUser.assignments[assignmentItem.key] = Assignment(dictionary: assignmentItem.value)
                             }
+                            GradeKeeper.storage.user().save()
                             callback(true, nil)
                         } else {
                             callback(false, APIError())
@@ -483,6 +487,7 @@ class GradeKeeper {
         
         func load(callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
             if GradeKeeper.currentUser.isLocal {
+                GradeKeeper.storage.user().save()
                 callback(true, nil)
             } else {
                 GKCalls().getCourses(&GradeKeeper.currentUser) { (success, result, error) in
@@ -490,6 +495,7 @@ class GradeKeeper {
                         if let gradebook = result!["gradebook"] as? [String: Any] {
                             GradeKeeper.currentUser.courses = GradeKeeper.currentUser.configClasses(dictionary: gradebook)
                             GradeKeeper.terms().load() { (trmSuccess, trmError) in
+                                GradeKeeper.storage.user().save()
                                 callback(trmSuccess, trmError)
                             }
                         } else {
@@ -609,6 +615,7 @@ class GradeKeeper {
         
         func load(callback: @escaping (_ success: Bool, _ error: APIError?) -> Void) {
             if GradeKeeper.currentUser.isLocal {
+                GradeKeeper.storage.user().save()
                 callback(true, nil)
             } else {
                 GKCalls().getTerms(&GradeKeeper.currentUser) { (success, result, error) in
@@ -616,6 +623,7 @@ class GradeKeeper {
                         if let terms = result!["terms"] as? [String: Any] {
                             
                             GradeKeeper.currentUser.terms = GradeKeeper.currentUser.configTerms(dictionary: terms)
+                            GradeKeeper.storage.user().save()
                             callback(true, nil)
                         } else {
                             callback(false, APIError())
@@ -834,6 +842,12 @@ class GradeKeeper {
             dateFormatterPrint.dateFormat = "MMM dd, yyyy h:mm a"
             return dateFormatterPrint.string(from: dueDate)
         }
+        func timeMillisFormatted(_ timeMillis: UInt64) -> String {
+            let dueDate = Date(timeIntervalSince1970: TimeInterval(timeMillis / 1000))
+            let dateFormatterPrint = DateFormatter()
+            dateFormatterPrint.dateFormat = "h:mm a"
+            return dateFormatterPrint.string(from: dueDate)
+        }
         
     }
     
@@ -845,12 +859,12 @@ class GradeKeeper {
                 let jsonEncoder = JSONEncoder()
                 let jsonData = try? jsonEncoder.encode(GradeKeeper.currentUser)
                 if let jsonData = jsonData {
-                    GradeKeeper.storage.documents().save(data: jsonData, name: "user", format: "json")
+                    GradeKeeper.storage.appSupport().save(data: jsonData, name: "user", format: "json")
                 }
             }
             
             func load() {
-                if let jsonData = GradeKeeper.storage.documents().load(path: "user.json") {
+                if let jsonData = GradeKeeper.storage.appSupport().load(path: "user.json") {
                     let decoder = JSONDecoder()
 
                     if let loadedUser = try? decoder.decode(User.self, from: jsonData) {
@@ -908,8 +922,18 @@ class GradeKeeper {
             func save(data: Data, name: String, format: String) -> URL? {
                 let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
                 
-                let filePath = appSupportDirectory.appendingPathComponent(name + "." + format)
+                let appDirectory = appSupportDirectory.appendingPathComponent("Courseman")
                 
+                //Create subdirectory if it doesn't exist
+                if !FileManager.default.fileExists(atPath:appDirectory.path) {
+                    do {
+                        try? FileManager.default.createDirectory(at: appDirectory, withIntermediateDirectories: true, attributes: nil)
+                    }
+                }
+                
+                let filePath = appSupportDirectory.appendingPathComponent("Courseman").appendingPathComponent(name + "." + format)
+                
+                print(filePath)
                 if FileManager.default.fileExists(atPath: filePath.path) {
                     do {
                         try? FileManager.default.removeItem(at: filePath)
@@ -926,7 +950,7 @@ class GradeKeeper {
             
             func load(path: String) -> Data? {
                 let appSupportDirectory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-                let filePath = appSupportDirectory.appendingPathComponent(path)
+                let filePath = appSupportDirectory.appendingPathComponent("Courseman").appendingPathComponent(path)
                 
                 do {
                     if let data = try? Data(contentsOf: filePath) {

@@ -40,24 +40,19 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function deleteTerm(con: any, req: any, res: any) {
+export function deleteTerm(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
   var body: DeleteTermArgs = req.body;
 
-  validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
+  validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
-      performAction(con, req, res, body, (paStatus: number, paOutput: Object) => {
-        res.statusCode = paStatus;
-        res.json(paOutput);
-      });
+      performAction(con, body, callback);
     } else {
-      res.statusCode = viStatus;
-      res.json(viOutput);
+      callback(viStatus, viOutput);
     }
   });
 
 }
-
 /**
  * Validate user input before performing request.
  * Errors here should typically return HTTP code 400.
@@ -67,7 +62,7 @@ export function deleteTerm(con: any, req: any, res: any) {
  * @param {any} res the Express result
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: DeleteTermArgs, callback: (statusCode: number, output: Object) => void) {
+function validateInput(con: any, body: DeleteTermArgs, callback: (statusCode: number, output: Object) => void) {
   if (body.internal_id != null && body.token != null && body.term_id != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
@@ -89,7 +84,7 @@ function validateInput(con: any, req: any, res: any, body: DeleteTermArgs, callb
  * @param {any} res the Express result
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: DeleteTermArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: DeleteTermArgs, callback: (statusCode: number, output: Object) => void) {
   var delSql = "DELETE FROM terms WHERE term_id = ? AND internal_id = ?";
   var delArgs: [string, string] = [body.term_id, body.internal_id];
   con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {

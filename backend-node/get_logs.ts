@@ -37,19 +37,15 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function getLogs(con: any, req: any, res: any) {
+export function getLogs(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
   var body: GetLogsArgs = req.body;
 
-  validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
+  validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
-      performAction(con, req, res, body, (paStatus: number, paOutput: Object) => {
-        res.statusCode = paStatus;
-        res.json(paOutput);
-      });
+      performAction(con, body, callback);
     } else {
-      res.statusCode = viStatus;
-      res.json(viOutput);
+      callback(viStatus, viOutput);
     }
   });
 
@@ -64,7 +60,7 @@ export function getLogs(con: any, req: any, res: any) {
  * @param {any} res the Express result
  * @param {GetLogsArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: GetLogsArgs, callback: (statusCode: number, output: Object) => void) {
+function validateInput(con: any, body: GetLogsArgs, callback: (statusCode: number, output: Object) => void) {
   if (body.api_key != null) {
 
     //Check API Key
@@ -108,7 +104,7 @@ function validateInput(con: any, req: any, res: any, body: GetLogsArgs, callback
  * @param {any} res the Express result
  * @param {GetLogsArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: GetLogsArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: GetLogsArgs, callback: (statusCode: number, output: Object) => void) {
   var sql: string = "SELECT * FROM usage_log"
   var args: any[] = []
   con.query(sql, args, (err: QueryError, res: any) => {

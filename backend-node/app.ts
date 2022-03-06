@@ -43,7 +43,6 @@ import { getLogs } from './get_logs';
 import { getStructure } from './get_structure';
 import { getAssignments } from './get_assignments';
 import { getTerms } from './get_terms';
-import { getClassSchedule } from './get_class_schedule';
 
 import { modifyClass } from './modify_class';
 import { modifyCategory } from './modify_category';
@@ -66,7 +65,7 @@ app.use(express.json());
 
 var isConnected: boolean = false;
 
-function createRequest(req: any, res: any, apiFunc: (apiCon: any, apiReq: any, apiRes: any) => void) {
+function createRequest(req: any, res: any, apiFunc: (apiCon: any, apiRes: any, apiCallback: (status: number, output: Object) => void) => void) {
   var con = mysql.createConnection(credentials);
   con.connect(function(err: QueryError) {
     if (err) {
@@ -76,8 +75,13 @@ function createRequest(req: any, res: any, apiFunc: (apiCon: any, apiReq: any, a
         error: "ERR_DB_ACCESS",
         message: "Unable to access database."
       });
+      con.end();
     } else {
-      apiFunc(con, req, res);
+      apiFunc(con, req, (status: number, output: Object) => {
+        res.statusCode = status;
+        res.json(output);
+        con.end();
+      });
     }
   });
 }
@@ -100,11 +104,6 @@ app.post('/create_class', (req, res) => {
 app.post('/set_class_schedule', (req, res) => {
   logRequest("post", "set_class_schedule", req);
   createRequest(req, res, setClassSchedule);
-});
-
-app.post('/get_class_schedule', (req, res) => {
-  logRequest("post", "get_class_schedule", req);
-  createRequest(req, res, getClassSchedule);
 });
 
 app.post('/get_classes', (req, res) => {

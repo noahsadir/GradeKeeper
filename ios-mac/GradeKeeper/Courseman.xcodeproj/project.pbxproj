@@ -28,6 +28,9 @@
 		FF67D71E272B1A5A00E847A2 /* CourseListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF67D71D272B1A5A00E847A2 /* CourseListTableViewCell.swift */; };
 		FF67D720272B1D1D00E847A2 /* AssignmentTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF67D71F272B1D1D00E847A2 /* AssignmentTableViewCell.swift */; };
 		FF67D722272B1F5700E847A2 /* ViewCourseTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF67D721272B1F5700E847A2 /* ViewCourseTableViewController.swift */; };
+		FF997E0A27D562190049A5A3 /* EditScheduleTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF997E0927D562190049A5A3 /* EditScheduleTableViewController.swift */; };
+		FFB8749D27D2F03500EA1A92 /* DoubleRightDetailTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB8749C27D2F03500EA1A92 /* DoubleRightDetailTableViewCell.swift */; };
+		FFB8749F27D2F0C400EA1A92 /* ViewCourseScheduleTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB8749E27D2F0C400EA1A92 /* ViewCourseScheduleTableViewController.swift */; };
 		FFC146C0276EE5FD00417299 /* GKStructures.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC146BF276EE5FD00417299 /* GKStructures.swift */; };
 		FFC146C2276EE65000417299 /* GKCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC146C1276EE65000417299 /* GKCalls.swift */; };
 		FFC14703276FEB5900417299 /* CreateCourseTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFC14702276FEB5900417299 /* CreateCourseTableViewController.swift */; };
@@ -90,6 +93,9 @@
 		FF67D71D272B1A5A00E847A2 /* CourseListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CourseListTableViewCell.swift; sourceTree = "<group>"; };
 		FF67D71F272B1D1D00E847A2 /* AssignmentTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AssignmentTableViewCell.swift; sourceTree = "<group>"; };
 		FF67D721272B1F5700E847A2 /* ViewCourseTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCourseTableViewController.swift; sourceTree = "<group>"; };
+		FF997E0927D562190049A5A3 /* EditScheduleTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditScheduleTableViewController.swift; sourceTree = "<group>"; };
+		FFB8749C27D2F03500EA1A92 /* DoubleRightDetailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoubleRightDetailTableViewCell.swift; sourceTree = "<group>"; };
+		FFB8749E27D2F0C400EA1A92 /* ViewCourseScheduleTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewCourseScheduleTableViewController.swift; sourceTree = "<group>"; };
 		FFC146BF276EE5FD00417299 /* GKStructures.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GKStructures.swift; sourceTree = "<group>"; };
 		FFC146C1276EE65000417299 /* GKCalls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GKCalls.swift; sourceTree = "<group>"; };
 		FFC14702276FEB5900417299 /* CreateCourseTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateCourseTableViewController.swift; sourceTree = "<group>"; };
@@ -198,8 +204,10 @@
 				FFCCDCAE27AF81EE00E8C6CD /* CreateTermTableViewController.swift */,
 				FF5E6E97272C6141006F895E /* EditAssignmentTableViewController.swift */,
 				FFC14704277033B500417299 /* EditGradeTableViewController.swift */,
+				FF997E0927D562190049A5A3 /* EditScheduleTableViewController.swift */,
 				FFC14706277033BE00417299 /* EditCategoryTableViewController.swift */,
 				FFFCC8B627C311E800110E93 /* ViewTermTableViewController.swift */,
+				FFB8749E27D2F0C400EA1A92 /* ViewCourseScheduleTableViewController.swift */,
 				FFC14708277033EF00417299 /* ViewCategoriesTableViewController.swift */,
 				FFC1470A2770340000417299 /* ViewGradeScaleTableViewController.swift */,
 				FF5E6E9F27363ED9006F895E /* ViewAssignmentTableViewController.swift */,
@@ -225,6 +233,7 @@
 			isa = PBXGroup;
 			children = (
 				FF67D71D272B1A5A00E847A2 /* CourseListTableViewCell.swift */,
+				FFB8749C27D2F03500EA1A92 /* DoubleRightDetailTableViewCell.swift */,
 				FF2CB21727C2BD88007C1DE7 /* CourseSelectionTableViewCell.swift */,
 				FF67D71F272B1D1D00E847A2 /* AssignmentTableViewCell.swift */,
 				FF22668D27C7E5300008CAD8 /* OverallGradeTableViewCell.swift */,
@@ -368,14 +377,17 @@
 			files = (
 				FF5E6E98272C6141006F895E /* EditAssignmentTableViewController.swift in Sources */,
 				FFC14707277033BE00417299 /* EditCategoryTableViewController.swift in Sources */,
+				FF997E0A27D562190049A5A3 /* EditScheduleTableViewController.swift in Sources */,
 				FF5E6E9E2731C991006F895E /* CreateCategoryTableViewController.swift in Sources */,
 				FF67D71C272B05BF00E847A2 /* LoginViewController.swift in Sources */,
 				FFC14703276FEB5900417299 /* CreateCourseTableViewController.swift in Sources */,
 				FFCCDCAD27AF206800E8C6CD /* SelectTermTableViewController.swift in Sources */,
 				FFC146C0276EE5FD00417299 /* GKStructures.swift in Sources */,
+				FFB8749F27D2F0C400EA1A92 /* ViewCourseScheduleTableViewController.swift in Sources */,
 				FFC146C2276EE65000417299 /* GKCalls.swift in Sources */,
 				FF22669027CAB1D90008CAD8 /* CategorySummaryTableViewCell.swift in Sources */,
 				FFCCDCAF27AF81EE00E8C6CD /* CreateTermTableViewController.swift in Sources */,
+				FFB8749D27D2F03500EA1A92 /* DoubleRightDetailTableViewCell.swift in Sources */,
 				FF5E6E9A27304467006F895E /* SplitViewController.swift in Sources */,
 				FFC6855D272A3F8D00CDFE99 /* MainTableViewController.swift in Sources */,
 				FF5E6EA027363ED9006F895E /* ViewAssignmentTableViewController.swift in Sources */,
@@ -576,7 +588,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y7NL9XLUR5;
 				INFOPLIST_FILE = GradeKeeper/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -601,7 +613,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = Y7NL9XLUR5;
 				INFOPLIST_FILE = GradeKeeper/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 14.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

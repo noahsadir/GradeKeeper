@@ -42,21 +42,18 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function getStructure(con: any, req: any, res: any) {
+export function getStructure(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
   var body: GetStructureArgs = req.body;
 
-  validateInput(con, req, res, body, (viStatus: number, viOutput: Object) => {
+  validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
-      performAction(con, req, res, body, (paStatus: number, paOutput: Object) => {
-        res.statusCode = paStatus;
-        res.json(paOutput);
-      });
+      performAction(con, body, callback);
     } else {
-      res.statusCode = viStatus;
-      res.json(viOutput);
+      callback(viStatus, viOutput);
     }
   });
+
 }
 
 /**
@@ -68,7 +65,7 @@ export function getStructure(con: any, req: any, res: any) {
  * @param {any} res the Express result
  * @param {GetStructureArgs} body the arguments provided by the user
  */
-function validateInput(con: any, req: any, res: any, body: GetStructureArgs, callback: (statusCode: number, output: Object) => void) {
+function validateInput(con: any, body: GetStructureArgs, callback: (statusCode: number, output: Object) => void) {
   if (body.internal_id != null && body.token != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
@@ -89,7 +86,7 @@ function validateInput(con: any, req: any, res: any, body: GetStructureArgs, cal
  * @param {any} res the Express result
  * @param {GetStructureArgs} body the arguments provided by the user
  */
-function performAction(con: any, req: any, res: any, body: GetStructureArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: GetStructureArgs, callback: (statusCode: number, output: Object) => void) {
   var gradebook: Gradebook = {classes: {}};
   selectAllFromWhere(con, "class_id","edit_permissions","internal_id", body.internal_id, (result: any[], err: QueryError) => {
     var classIDs: string[] = [];
