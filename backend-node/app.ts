@@ -2,11 +2,22 @@
 /*
  Copyright (c) 2021-2022 Noah Sadir
 
- Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is furnished
+ to do so, subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
 import express from 'express';
@@ -52,132 +63,143 @@ var credentials: Credentials = require('./credentials.json');
 
 const app = express();
 app.use(express.json());
-var con = mysql.createConnection(credentials);
+
 var isConnected: boolean = false;
 
-con.connect(function(err: QueryError) {
-  if (err) throw err;
-  isConnected = true;
-});
+function createRequest(req: any, res: any, apiFunc: (apiCon: any, apiReq: any, apiRes: any) => void) {
+  var con = mysql.createConnection(credentials);
+  con.connect(function(err: QueryError) {
+    if (err) {
+      res.statusCode = 500;
+      res.json({
+        success: false,
+        error: "ERR_DB_ACCESS",
+        message: "Unable to access database."
+      });
+    } else {
+      apiFunc(con, req, res);
+    }
+  });
+}
 
 app.post('/create_user', (req, res) => {
   logRequest("post", "create_user", req);
-  createUser(con, req, res);
+  createRequest(req, res, createUser);
 });
 
 app.post('/authenticate_user', (req, res) => {
   logRequest("post", "authenticate_user", req);
-  authenticateUser(con, req, res);
+  createRequest(req, res, authenticateUser);
 });
 
 app.post('/create_class', (req, res) => {
   logRequest("post", "create_class", req);
-  createClass(con, req, res);
+  createRequest(req, res, createClass);
 });
 
 app.post('/set_class_schedule', (req, res) => {
   logRequest("post", "set_class_schedule", req);
-  setClassSchedule(con, req, res);
+  createRequest(req, res, setClassSchedule);
 });
 
 app.post('/get_class_schedule', (req, res) => {
   logRequest("post", "get_class_schedule", req);
-  getClassSchedule(con, req, res);
+  createRequest(req, res, getClassSchedule);
 });
 
 app.post('/get_classes', (req, res) => {
   logRequest("post", "get_classes", req);
-  getClasses(con, req, res);
+  createRequest(req, res, getClasses);
 });
 
 app.post('/get_structure', (req, res) => {
   logRequest("post", "get_structure", req);
-  getStructure(con, req, res);
+  createRequest(req, res, getStructure);
 });
 
 app.post('/get_logs', (req, res) => {
   logRequest("post", "get_logs", req);
-  getLogs(con, req, res);
+  createRequest(req, res, getLogs);
 });
 
 app.post('/get_terms', (req, res) => {
   logRequest("post", "get_terms", req);
-  getTerms(con, req, res);
+  createRequest(req, res, getTerms);
 });
 
 app.post('/get_assignments', (req, res) => {
   logRequest("post", "get_assignments", req);
-  getAssignments(con, req, res);
+  createRequest(req, res, getAssignments);
 });
 
 app.post('/create_category', (req, res) => {
   logRequest("post", "create_category", req);
-  createCategory(con, req, res);
+  createRequest(req, res, createCategory);
 });
 
 app.post('/create_grade', (req, res) => {
   logRequest("post", "create_grade", req);
-  createGrade(con, req, res);
+  createRequest(req, res, createGrade);
 });
 
 app.post('/create_assignment', (req, res) => {
   logRequest("post", "create_assignment", req);
-  createAssignment(con, req, res);
+  createRequest(req, res, createAssignment);
 });
 
 app.post('/create_term', (req, res) => {
   logRequest("post", "create_term", req);
-  createTerm(con, req, res);
+  createRequest(req, res, createTerm);
 });
 
 app.post('/modify_class', (req, res) => {
   logRequest("post", "modify_class", req);
-  modifyClass(con, req, res);
+  createRequest(req, res, modifyClass);
 });
 
 app.post('/modify_category', (req, res) => {
   logRequest("post", "modify_category", req);
-  modifyCategory(con, req, res);
+  createRequest(req, res, modifyCategory);
 });
 
 app.post('/modify_grade', (req, res) => {
   logRequest("post", "modify_grade", req);
-  modifyGrade(con, req, res);
+  createRequest(req, res, modifyGrade);
 });
 
 app.post('/modify_assignment', (req, res) => {
   logRequest("post", "modify_assignment", req);
-  modifyAssignment(con, req, res);
+  createRequest(req, res, modifyAssignment);
 });
 
 app.post('/modify_term', (req, res) => {
   logRequest("post", "modify_term", req);
-  modifyTerm(con, req, res);
+  createRequest(req, res, modifyTerm);
 });
 
 app.post('/delete_assignment', (req, res) => {
   logRequest("post", "delete_assignment", req);
-  deleteAssignment(con, req, res);
+  createRequest(req, res, deleteAssignment);
 });
 
 app.post('/delete_category', (req, res) => {
   logRequest("post", "delete_category", req);
-  deleteCategory(con, req, res);
+  createRequest(req, res, deleteCategory);
 });
 
 app.post('/delete_class', (req, res) => {
   logRequest("post", "delete_class", req);
-  deleteClass(con, req, res);
+  createRequest(req, res, deleteClass);
 });
 
 app.post('/delete_grade', (req, res) => {
   logRequest("post", "delete_grade", req);
-  deleteGrade(con, req, res);
+  createRequest(req, res, deleteGrade);
 });
 
 app.post('/delete_term', (req, res) => {
   logRequest("post", "delete_term", req);
-  deleteTerm(con, req, res);
+  createRequest(req, res, deleteTerm);
 });
 
 app.get('*', (req, res) => {
@@ -205,15 +227,20 @@ app.listen(3000, () => {
 });
 
 function logRequest(method: string, callName: string, req: any) {
-  var body: any = req.body;
-  var internalID = null;
-  var apiKey = null;
-  if (body) {
-    internalID = body.internal_id;
-    apiKey = body.api_key;
-  }
+  var con = mysql.createConnection(credentials);
+  con.connect(function(err: QueryError) {
+    if (!err) {
+      var body: any = req.body;
+      var internalID = null;
+      var apiKey = null;
+      if (body) {
+        internalID = body.internal_id;
+        apiKey = body.api_key;
+      }
 
-  var sql = "INSERT INTO usage_log (method, call_type, internal_id, api_key, timestamp) VALUES (?, ?, ?, ?, ?)";
-  var args: [string, string, string, string, number] = [method, callName, internalID, apiKey, Math.round(Date.now() / 1000)];
-  con.query(sql, args);
+      var sql = "INSERT INTO usage_log (method, call_type, internal_id, api_key, timestamp) VALUES (?, ?, ?, ?, ?)";
+      var args: [string, string, string, string, number] = [method, callName, internalID, apiKey, Math.round(Date.now() / 1000)];
+      con.query(sql, args);
+    }
+  });
 }
