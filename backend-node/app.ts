@@ -63,143 +63,42 @@ var credentials: Credentials = require('./credentials.json');
 const app = express();
 app.use(express.json());
 
-var isConnected: boolean = false;
-
-function createRequest(req: any, res: any, apiFunc: (apiCon: any, apiRes: any, apiCallback: (status: number, output: Object) => void) => void) {
-  var con = mysql.createConnection(credentials);
-  con.connect(function(err: QueryError) {
-    if (err) {
-      res.statusCode = 500;
-      res.json({
-        success: false,
-        error: "ERR_DB_ACCESS",
-        message: "Unable to access database."
-      });
-      con.end();
-    } else {
-      apiFunc(con, req, (status: number, output: Object) => {
-        res.statusCode = status;
-        res.json(output);
-        con.end();
-      });
-    }
-  });
+var postCalls: any = {
+  authenticate_user: authenticateUser,
+  create_user: createUser,
+  create_class: createClass,
+  create_assignment: createAssignment,
+  create_category: createCategory,
+  create_grade: createGrade,
+  create_term: createTerm,
+  delete_assignment: deleteAssignment,
+  delete_category: deleteCategory,
+  delete_class: deleteClass,
+  delete_grade: deleteGrade,
+  delete_term: deleteTerm,
+  get_assignments: getAssignments,
+  get_classes: getClasses,
+  get_logs: getLogs,
+  get_structure: getStructure,
+  get_terms: getTerms,
+  modify_assignment: modifyAssignment,
+  modify_class: modifyClass,
+  modify_category: modifyCategory,
+  modify_grade: modifyGrade,
+  modify_term: modifyTerm,
+  set_class_schedule: setClassSchedule
 }
 
-app.post('/create_user', (req, res) => {
-  logRequest("post", "create_user", req);
-  createRequest(req, res, createUser);
-});
+var isConnected: boolean = false;
 
-app.post('/authenticate_user', (req, res) => {
-  logRequest("post", "authenticate_user", req);
-  createRequest(req, res, authenticateUser);
-});
-
-app.post('/create_class', (req, res) => {
-  logRequest("post", "create_class", req);
-  createRequest(req, res, createClass);
-});
-
-app.post('/set_class_schedule', (req, res) => {
-  logRequest("post", "set_class_schedule", req);
-  createRequest(req, res, setClassSchedule);
-});
-
-app.post('/get_classes', (req, res) => {
-  logRequest("post", "get_classes", req);
-  createRequest(req, res, getClasses);
-});
-
-app.post('/get_structure', (req, res) => {
-  logRequest("post", "get_structure", req);
-  createRequest(req, res, getStructure);
-});
-
-app.post('/get_logs', (req, res) => {
-  logRequest("post", "get_logs", req);
-  createRequest(req, res, getLogs);
-});
-
-app.post('/get_terms', (req, res) => {
-  logRequest("post", "get_terms", req);
-  createRequest(req, res, getTerms);
-});
-
-app.post('/get_assignments', (req, res) => {
-  logRequest("post", "get_assignments", req);
-  createRequest(req, res, getAssignments);
-});
-
-app.post('/create_category', (req, res) => {
-  logRequest("post", "create_category", req);
-  createRequest(req, res, createCategory);
-});
-
-app.post('/create_grade', (req, res) => {
-  logRequest("post", "create_grade", req);
-  createRequest(req, res, createGrade);
-});
-
-app.post('/create_assignment', (req, res) => {
-  logRequest("post", "create_assignment", req);
-  createRequest(req, res, createAssignment);
-});
-
-app.post('/create_term', (req, res) => {
-  logRequest("post", "create_term", req);
-  createRequest(req, res, createTerm);
-});
-
-app.post('/modify_class', (req, res) => {
-  logRequest("post", "modify_class", req);
-  createRequest(req, res, modifyClass);
-});
-
-app.post('/modify_category', (req, res) => {
-  logRequest("post", "modify_category", req);
-  createRequest(req, res, modifyCategory);
-});
-
-app.post('/modify_grade', (req, res) => {
-  logRequest("post", "modify_grade", req);
-  createRequest(req, res, modifyGrade);
-});
-
-app.post('/modify_assignment', (req, res) => {
-  logRequest("post", "modify_assignment", req);
-  createRequest(req, res, modifyAssignment);
-});
-
-app.post('/modify_term', (req, res) => {
-  logRequest("post", "modify_term", req);
-  createRequest(req, res, modifyTerm);
-});
-
-app.post('/delete_assignment', (req, res) => {
-  logRequest("post", "delete_assignment", req);
-  createRequest(req, res, deleteAssignment);
-});
-
-app.post('/delete_category', (req, res) => {
-  logRequest("post", "delete_category", req);
-  createRequest(req, res, deleteCategory);
-});
-
-app.post('/delete_class', (req, res) => {
-  logRequest("post", "delete_class", req);
-  createRequest(req, res, deleteClass);
-});
-
-app.post('/delete_grade', (req, res) => {
-  logRequest("post", "delete_grade", req);
-  createRequest(req, res, deleteGrade);
-});
-
-app.post('/delete_term', (req, res) => {
-  logRequest("post", "delete_term", req);
-  createRequest(req, res, deleteTerm);
-});
+// configure all api calls
+for (var callType in postCalls) {
+  app.post('/' + callType, (req, res) => {
+    var key = req.path.replace("/","");
+    logRequest("post", key, req);
+    makeRequest(req, res, postCalls[key]);
+  });
+}
 
 app.get('*', (req, res) => {
   logRequest("get", "*", req);
@@ -224,6 +123,27 @@ app.post('*', (req, res) => {
 app.listen(3000, () => {
     console.log('The application is listening on port 3000!');
 });
+
+function makeRequest(req: any, res: any, apiFunc: (apiCon: any, apiRes: any, apiCallback: (status: number, output: Object) => void) => void) {
+  var con = mysql.createConnection(credentials);
+  con.connect(function(err: QueryError) {
+    if (err) {
+      res.statusCode = 500;
+      res.json({
+        success: false,
+        error: "ERR_DB_ACCESS",
+        message: "Unable to access database."
+      });
+      con.end();
+    } else {
+      apiFunc(con, req, (status: number, output: Object) => {
+        res.statusCode = status;
+        res.json(output);
+        con.end();
+      });
+    }
+  });
+}
 
 function logRequest(method: string, callName: string, req: any) {
   var con = mysql.createConnection(credentials);
