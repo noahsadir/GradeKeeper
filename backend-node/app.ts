@@ -36,6 +36,7 @@ import { createCategory } from './create_category';
 import { createGrade } from './create_grade';
 import { createAssignment } from './create_assignment';
 import { createTerm} from './create_term';
+
 import { setClassSchedule } from './set_class_schedule';
 
 import { getClasses } from './get_classes';
@@ -89,8 +90,6 @@ var postCalls: any = {
   set_class_schedule: setClassSchedule
 }
 
-var isConnected: boolean = false;
-
 // configure all api calls
 for (var callType in postCalls) {
   app.post('/' + callType, (req, res) => {
@@ -131,8 +130,9 @@ function makeRequest(req: any, res: any, apiFunc: (apiCon: any, apiRes: any, api
       res.statusCode = 500;
       res.json({
         success: false,
-        error: "ERR_DB_ACCESS",
-        message: "Unable to access database."
+        error: "DBG_ERR_DB_ACCESS",
+        message: "Unable to access database.",
+        details: err
       });
       con.end();
     } else {
@@ -160,6 +160,7 @@ function logRequest(method: string, callName: string, req: any) {
       var sql = "INSERT INTO usage_log (method, call_type, internal_id, api_key, timestamp) VALUES (?, ?, ?, ?, ?)";
       var args: [string, string, string, string, number] = [method, callName, internalID, apiKey, Math.round(Date.now() / 1000)];
       con.query(sql, args);
+      con.end();
     }
   });
 }

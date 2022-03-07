@@ -88,8 +88,8 @@ function validateInput(con: any, body: DeleteGradeArgs, callback: (statusCode: n
 function performAction(con: any, body: DeleteGradeArgs, callback: (statusCode: number, output: Object) => void) {
   getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
-      var delSql = "DELETE FROM grade_scales WHERE grade_id = ?";
-      var delArgs: [string] = [body.grade_id];
+      var delSql = "DELETE FROM grade_scales WHERE class_id = ? AND grade_id = ?";
+      var delArgs: [string] = [body.class_id, body.grade_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
         if (!delErr) {
           callback(200, {
