@@ -31,21 +31,20 @@ import {
 import { authenticateUser } from './authenticate_user';
 
 import { createUser } from './create_user';
-import { createClass } from './create_class';
+import { createCourse } from './create_course';
 import { createCategory } from './create_category';
 import { createGrade } from './create_grade';
 import { createAssignment } from './create_assignment';
 import { createTerm} from './create_term';
 
-import { setClassSchedule } from './set_class_schedule';
+import { setCourseSchedule } from './set_course_schedule';
 
-import { getClasses } from './get_classes';
+import { getCourses } from './get_courses';
 import { getLogs } from './get_logs';
-import { getStructure } from './get_structure';
 import { getAssignments } from './get_assignments';
 import { getTerms } from './get_terms';
 
-import { modifyClass } from './modify_class';
+import { modifyCourse } from './modify_course';
 import { modifyCategory } from './modify_category';
 import { modifyGrade } from './modify_grade';
 import { modifyAssignment } from './modify_assignment';
@@ -54,7 +53,7 @@ import { modifyTerm } from './modify_term';
 import { deleteAssignment } from './delete_assignment';
 import { deleteCategory } from './delete_category';
 import { deleteGrade } from './delete_grade';
-import { deleteClass } from './delete_class';
+import { deleteCourse } from './delete_course';
 import { deleteTerm } from './delete_term';
 
 var mysql = require('mysql2');
@@ -67,33 +66,43 @@ app.use(express.json());
 var postCalls: any = {
   authenticate_user: authenticateUser,
   create_user: createUser,
-  create_class: createClass,
+  create_class: createCourse,
+  create_course: createCourse,
   create_assignment: createAssignment,
   create_category: createCategory,
   create_grade: createGrade,
   create_term: createTerm,
   delete_assignment: deleteAssignment,
   delete_category: deleteCategory,
-  delete_class: deleteClass,
+  delete_class: deleteCourse,
+  delete_course: deleteCourse,
   delete_grade: deleteGrade,
   delete_term: deleteTerm,
   get_assignments: getAssignments,
-  get_classes: getClasses,
+  get_classes: getCourses,
+  get_courses: getCourses,
   get_logs: getLogs,
-  get_structure: getStructure,
   get_terms: getTerms,
   modify_assignment: modifyAssignment,
-  modify_class: modifyClass,
+  modify_class: modifyCourse,
+  modify_course: modifyCourse,
   modify_category: modifyCategory,
   modify_grade: modifyGrade,
   modify_term: modifyTerm,
-  set_class_schedule: setClassSchedule
+  set_class_schedule: setCourseSchedule,
+  set_course_schedule: setCourseSchedule,
 }
 
 // configure all api calls
 for (var callType in postCalls) {
   app.post('/' + callType, (req, res) => {
     var key = req.path.replace("/","");
+
+    // support for old implementations that use 'class_id'
+    if (req.body.class_id != null) {
+      req.body.course_id = req.body.class_id;
+    }
+
     logRequest("post", key, req);
     makeRequest(req, res, postCalls[key]);
   });

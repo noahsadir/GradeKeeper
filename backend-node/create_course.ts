@@ -23,7 +23,7 @@
 import {
   Credentials,
   QueryError,
-  CreateClassArgs
+  CreateCourseArgs
 } from './interfaces';
 
 import {
@@ -39,9 +39,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function createClass(con: any, req: any, callback: (stat: number, output: Object) => void) {
+export function createCourse(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
-  var body: CreateClassArgs = req.body;
+  var body: CreateCourseArgs = req.body;
 
   validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -60,9 +60,9 @@ export function createClass(con: any, req: any, callback: (stat: number, output:
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {CreateClassArgs} body the arguments provided by the user
+ * @param {CreateCourseArgs} body the arguments provided by the user
  */
-function validateInput(con: any, body: CreateClassArgs, callback: (statusCode: number, output: Object) => void) {
+function validateInput(con: any, body: CreateCourseArgs, callback: (statusCode: number, output: Object) => void) {
   if (body.internal_id != null && body.token != null && body.class_name != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
@@ -81,30 +81,31 @@ function validateInput(con: any, body: CreateClassArgs, callback: (statusCode: n
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {CreateClassArgs} body the arguments provided by the user
+ * @param {CreateCourseArgs} body the arguments provided by the user
  */
-function performAction(con: any, body: CreateClassArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: CreateCourseArgs, callback: (statusCode: number, output: Object) => void) {
   //Generate internal ID
-  generateUniqueRandomString(con, 16, "classes", "class_id", (classID: string) => {
-    if (classID != null) {
+  generateUniqueRandomString(con, 16, "classes", "class_id", (courseID: string) => {
+    if (courseID != null) {
       var sql = "INSERT INTO classes (class_id, class_name, class_code, color, weight, instructor, term_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-      var args: [string, string, string, number, number, string, string] = [classID, body.class_name, body.class_code, body.color, body.weight, body.instructor, body.term_id];
+      var args: [string, string, string, number, number, string, string] = [courseID, body.class_name, body.class_code, body.color, body.weight, body.instructor, body.term_id];
 
       con.query(sql, args, function (addclaErr: Object, result: Object) {
         if (!addclaErr) {
           var editClassSql = "INSERT INTO edit_permissions (internal_id, class_id) VALUES (?, ?)";
-          var editClassArgs: [string, string] = [body.internal_id, classID];
-          con.query(editClassSql, editClassArgs, (addeditErr: Object, result: Object) => {
+          var editCourseArgs: [string, string] = [body.internal_id, courseID];
+          con.query(editClassSql, editCourseArgs, (addeditErr: Object, result: Object) => {
             if (!addeditErr) {
               callback(200, {
                 success: true,
-                class_id: classID
+                class_id: courseID,
+                course_id: courseID
               });
             } else {
               callback(500, {
                 success: false,
                 error: "DBG_ERR_USER_EDIT",
-                message: "Created list, but unable to give user edit permissions",
+                message: "Created course, but unable to give user edit permissions",
                 details: addeditErr
               });
             }
@@ -122,7 +123,7 @@ function performAction(con: any, body: CreateClassArgs, callback: (statusCode: n
       callback(500, {
         success: false,
         error: "ERR_RANDSTR_GENERATION",
-        message: "Unable to generate random string for class ID."
+        message: "Unable to generate random string for course ID."
       });
     }
   });

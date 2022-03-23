@@ -62,7 +62,7 @@ export function getAssignments(con: any, req: any, callback: (stat: number, outp
  * @param {GetAssignmentsArgs} body the arguments provided by the user
  */
  function validateInput(con: any, body: GetAssignmentsArgs, callback: (statusCode: number, output: Object) => void) {
-   if (body.internal_id != null && body.token != null && body.class_id != null) {
+   if (body.internal_id != null && body.token != null && body.course_id != null) {
      verifyToken(con, body.internal_id, body.token, callback);
    } else {
      callback(400, {
@@ -84,7 +84,7 @@ export function getAssignments(con: any, req: any, callback: (stat: number, outp
  */
 function performAction(con: any, body: GetAssignmentsArgs, callback: (statusCode: number, output: Object) => void) {
   var sql: string = "SELECT * FROM items WHERE class_id = ?";
-  var args: [string] = [body.class_id];
+  var args: [string] = [body.course_id];
   con.query(sql, args, (err: QueryError, res: any[]) => {
     if (!err) {
       var assignments: any = {};

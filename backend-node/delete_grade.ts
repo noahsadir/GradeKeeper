@@ -64,7 +64,7 @@ export function deleteGrade(con: any, req: any, callback: (stat: number, output:
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
 function validateInput(con: any, body: DeleteGradeArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.grade_id != null && body.class_id != null) {
+  if (body.internal_id != null && body.token != null && body.grade_id != null && body.course_id != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
     callback(400, {
@@ -86,10 +86,10 @@ function validateInput(con: any, body: DeleteGradeArgs, callback: (statusCode: n
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
 function performAction(con: any, body: DeleteGradeArgs, callback: (statusCode: number, output: Object) => void) {
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+  getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
       var delSql = "DELETE FROM grade_scales WHERE class_id = ? AND grade_id = ?";
-      var delArgs: [string] = [body.class_id, body.grade_id];
+      var delArgs: [string, string] = [body.course_id, body.grade_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
         if (!delErr) {
           callback(200, {
@@ -116,7 +116,7 @@ function performAction(con: any, body: DeleteGradeArgs, callback: (statusCode: n
       callback(400, {
         success: false,
         error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        message: "User does not have edit permissions for this course."
       });
     }
   });

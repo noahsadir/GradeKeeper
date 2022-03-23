@@ -64,7 +64,7 @@ export function modifyCategory(con: any, req: any, callback: (stat: number, outp
  * @param {ModifyCategoryArgs} body the arguments provided by the user
  */
 function validateInput(con: any, body: ModifyCategoryArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.category_id != null && body.category_name != null) {
+  if (body.internal_id != null && body.token != null && body.course_id != null && body.category_id != null && body.category_name != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
     callback(400, {
@@ -85,20 +85,20 @@ function validateInput(con: any, body: ModifyCategoryArgs, callback: (statusCode
  * @param {ModifyCategoryArgs} body the arguments provided by the user
  */
 function performAction(con: any, body: ModifyCategoryArgs, callback: (statusCode: number, output: Object) => void) {
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+  getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
       var delSql = "DELETE FROM categories WHERE category_id = ?";
-      var delArgs: [string] = [body.class_id];
+      var delArgs: [string] = [body.course_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
         if (!delErr) {
           var sql = "INSERT INTO categories (class_id, category_id, category_name, drop_count, weight) VALUES (?, ?, ?, ?, ?)";
-          var args: [string, string, string, number, number] = [body.class_id, body.category_id, body.category_name, body.drop_count, body.weight];
+          var args: [string, string, string, number, number] = [body.course_id, body.category_id, body.category_name, body.drop_count, body.weight];
 
           con.query(sql, args, function (catErr: Object, result: Object) {
             if (!catErr) {
               callback(200, {
                 success: true,
-                message: "Successfully modified category in class."
+                message: "Successfully modified category in course."
               });
             } else {
               callback(500, {
@@ -129,7 +129,7 @@ function performAction(con: any, body: ModifyCategoryArgs, callback: (statusCode
       callback(400, {
         success: false,
         error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        message: "User does not have edit permissions for this course."
       });
     }
   });

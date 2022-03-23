@@ -23,7 +23,7 @@
 import {
   Credentials,
   QueryError,
-  DeleteClassArgs
+  DeleteCourseArgs
 } from './interfaces';
 
 import {
@@ -40,9 +40,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function deleteClass(con: any, req: any, callback: (stat: number, output: Object) => void) {
+export function deleteCourse(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
-  var body: DeleteClassArgs = req.body;
+  var body: DeleteCourseArgs = req.body;
 
   validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -63,8 +63,8 @@ export function deleteClass(con: any, req: any, callback: (stat: number, output:
  * @param {any} res the Express result
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
-function validateInput(con: any, body: DeleteClassArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null) {
+function validateInput(con: any, body: DeleteCourseArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null && body.course_id != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
     callback(400, {
@@ -84,19 +84,19 @@ function validateInput(con: any, body: DeleteClassArgs, callback: (statusCode: n
  * @param {any} res the Express result
  * @param {DeleteAssignmentArgs} body the arguments provided by the user
  */
-function performAction(con: any, body: DeleteClassArgs, callback: (statusCode: number, output: Object) => void) {
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+function performAction(con: any, body: DeleteCourseArgs, callback: (statusCode: number, output: Object) => void) {
+  getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
       var delSql = "DELETE FROM classes WHERE class_id = ?";
-      var delArgs: [string] = [body.class_id];
+      var delArgs: [string] = [body.course_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
         var delEditSql = "DELETE FROM edit_permissions WHERE class_id = ?";
-        var delEditArgs: [string] = [body.class_id];
+        var delEditArgs: [string] = [body.course_id];
         con.query(delEditSql, delEditArgs, (delEditErr: QueryError, delEditRes: any, delEditFields: Object) => {
           if (!delErr && !delEditErr) {
             callback(200, {
               success: true,
-              message: "Successfully deleted class."
+              message: "Successfully deleted course."
             });
           } else if (delEditErr) {
             callback(500, {
@@ -126,7 +126,7 @@ function performAction(con: any, body: DeleteClassArgs, callback: (statusCode: n
       callback(400, {
         success: false,
         error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        message: "User does not have edit permissions for this course."
       });
     }
   });

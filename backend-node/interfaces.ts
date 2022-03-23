@@ -51,17 +51,17 @@ export interface Timeslot {
   address: string;
 }
 
-export interface SetClassScheduleArgs {
+export interface SetCourseScheduleArgs {
   internal_id: string;
   token: string;
-  class_id: string;
+  course_id: string;
   timeslots: Timeslot[];
 }
 
-export interface GetClassScheduleArgs {
+export interface GetCourseScheduleArgs {
   internal_id: string;
   token: string;
-  class_id: string;
+  course_id: string;
 }
 
 export interface AuthenticateUserArgs {
@@ -70,7 +70,7 @@ export interface AuthenticateUserArgs {
   password: string; // required
 }
 
-export interface CreateClassArgs {
+export interface CreateCourseArgs {
   internal_id: string; // required
   token: string; // required
   class_name: string; // required
@@ -84,7 +84,7 @@ export interface CreateClassArgs {
 export interface CreateCategoryArgs {
   internal_id: string; // required
   token: string; // required
-  class_id: string; // required
+  course_id: string; // required
   category_name: string; //required
   drop_count: number;
   weight: number;
@@ -101,7 +101,7 @@ export interface CreateTermArgs {
 export interface CreateGradeArgs {
   internal_id: string; // required
   token: string; // required
-  class_id: string; // required
+  course_id: string; // required
   grade_id: string; // required
   min_score: number; // required
   max_score: number;
@@ -111,7 +111,7 @@ export interface CreateGradeArgs {
 export interface CreateAssignmentArgs {
   internal_id: string; // required
   token: string; // required
-  class_id: string; // required
+  course_id: string; // required
   category_id: string; // required
   title: string;
   description: string;
@@ -129,28 +129,28 @@ export interface CreateAssignmentArgs {
 export interface DeleteAssignmentArgs {
   internal_id: string;
   token: string;
-  class_id: string;
+  course_id: string;
   assignment_id: string;
 }
 
 export interface DeleteCategoryArgs {
   internal_id: string;
   token: string;
-  class_id: string;
+  course_id: string;
   category_id: string;
 }
 
 export interface DeleteGradeArgs {
   internal_id: string;
   token: string;
-  class_id: string;
+  course_id: string;
   grade_id: string;
 }
 
-export interface DeleteClassArgs {
+export interface DeleteCourseArgs {
   internal_id: string;
   token: string;
-  class_id: string;
+  course_id: string;
 }
 
 export interface DeleteTermArgs {
@@ -159,10 +159,10 @@ export interface DeleteTermArgs {
   term_id: string;
 }
 
-export interface ModifyClassArgs {
+export interface ModifyCourseArgs {
   internal_id: string; // required
   token: string; // required
-  class_id: string // required
+  course_id: string // required
   class_name: string; // required
   class_code: string;
   color: number;
@@ -174,7 +174,7 @@ export interface ModifyClassArgs {
 export interface ModifyCategoryArgs {
   internal_id: string; // required
   token: string; // required
-  class_id: string; // required
+  course_id: string; // required
   category_id: string; // required
   category_name: string; //required
   drop_count: number;
@@ -194,7 +194,7 @@ export interface ModifyTermArgs {
 export interface ModifyGradeArgs {
   internal_id: string; // required
   token: string; // required
-  class_id: string; // required
+  course_id: string; // required
   grade_id: string; // required
   min_score: number; // required
   max_score: number;
@@ -204,7 +204,7 @@ export interface ModifyGradeArgs {
 export interface ModifyAssignmentArgs {
   internal_id: string; // required
   token: string; // required
-  class_id: string; // required
+  course_id: string; // required
   category_id: string; // required
   assignment_id: string; // required
   title: string;
@@ -220,7 +220,7 @@ export interface ModifyAssignmentArgs {
   modify_date: number;
 }
 
-export interface GetClassesArgs {
+export interface GetCoursesArgs {
   internal_id: string; // required
   token: string; // required
 }
@@ -233,7 +233,7 @@ export interface GetStructureArgs {
 export interface GetAssignmentsArgs {
   internal_id: string; // required
   token: string; // required
-  class_id: string; // required
+  course_id: string; // required
   ignore_before_date: number;
 }
 
@@ -248,4 +248,5 @@ export interface GetLogsArgs {
 
 export interface Gradebook {
   classes: any;
+  courses: any;
 }

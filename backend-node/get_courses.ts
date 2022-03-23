@@ -23,7 +23,7 @@
 import {
   Credentials,
   QueryError,
-  GetClassesArgs,
+  GetCoursesArgs,
   Gradebook,
   Timeslot
 } from './interfaces';
@@ -45,9 +45,9 @@ var currentClassID = "";
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function getClasses(con: any, req: any, callback: (stat: number, output: Object) => void) {
+export function getCourses(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
-  var body: GetClassesArgs = req.body;
+  var body: GetCoursesArgs = req.body;
 
   validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -66,9 +66,9 @@ export function getClasses(con: any, req: any, callback: (stat: number, output: 
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {GetClassesArgs} body the arguments provided by the user
+ * @param {GetCoursesArgs} body the arguments provided by the user
  */
-function validateInput(con: any, body: GetClassesArgs, callback: (statusCode: number, output: Object) => void) {
+function validateInput(con: any, body: GetCoursesArgs, callback: (statusCode: number, output: Object) => void) {
   if (body.internal_id != null && body.token != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
@@ -87,9 +87,9 @@ function validateInput(con: any, body: GetClassesArgs, callback: (statusCode: nu
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {GetClassesArgs} body the arguments provided by the user
+ * @param {GetCoursesArgs} body the arguments provided by the user
  */
-function performAction(con: any, body: GetClassesArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: GetCoursesArgs, callback: (statusCode: number, output: Object) => void) {
   var gradebook: Gradebook = {classes: {}};
   selectAllFromWhere(con, "class_id","edit_permissions","internal_id", body.internal_id, (result: any[], err: QueryError) => {
     var classIDs: string[] = [];

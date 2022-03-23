@@ -64,7 +64,7 @@ export function createCategory(con: any, req: any, callback: (stat: number, outp
  * @param {CreateCategoryArgs} body the arguments provided by the user
  */
 function validateInput(con: any, body: CreateCategoryArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.category_name != null) {
+  if (body.internal_id != null && body.token != null && body.course_id != null && body.category_name != null) {
 
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
@@ -89,16 +89,16 @@ function performAction(con: any, body: CreateCategoryArgs, callback: (statusCode
   //Generate internal ID
   generateUniqueRandomString(con, 16, "categories", "category_id", (categoryID: string) => {
     if (categoryID != null) {
-      getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+      getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
         if (!editErr && hasPermission) {
           var sql = "INSERT INTO categories (class_id, category_id, category_name, drop_count, weight) VALUES (?, ?, ?, ?, ?)";
-          var args: [string, string, string, number, number] = [body.class_id, categoryID, body.category_name, body.drop_count, body.weight];
+          var args: [string, string, string, number, number] = [body.course_id, categoryID, body.category_name, body.drop_count, body.weight];
 
           con.query(sql, args, function (addcatErr: Object, result: Object) {
             if (!addcatErr) {
               callback(200, {
                 success: true,
-                message: "Successfully added category to class."
+                message: "Successfully added category to course."
               });
             } else {
               callback(500, {
@@ -120,7 +120,7 @@ function performAction(con: any, body: CreateCategoryArgs, callback: (statusCode
           callback(400, {
             success: false,
             error: "ERR_EDIT_PERMISSSION",
-            message: "User does not have edit permissions for this class."
+            message: "User does not have edit permissions for this course."
           });
         }
       });

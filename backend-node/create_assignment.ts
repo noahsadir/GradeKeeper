@@ -64,7 +64,7 @@ export function createAssignment(con: any, req: any, callback: (stat: number, ou
  * @param {CreateAssignmentArgs} body the arguments provided by the user
  */
 function validateInput(con: any, body: CreateAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.category_id != null) {
+  if (body.internal_id != null && body.token != null && body.course_id != null && body.category_id != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
     callback(400, {
@@ -88,16 +88,16 @@ function performAction(con: any, body: CreateAssignmentArgs, callback: (statusCo
   //Generate internal ID
   generateUniqueRandomString(con, 16, "items", "assignment_id", (assignmentID: string) => {
     if (assignmentID != null) {
-      getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+      getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
         if (!editErr && hasPermission) {
           var modifyDate = Math.round(Date.now() / 1000);
           var sql = "INSERT INTO items (class_id, category_id, assignment_id, title, description, grade_id, act_score, max_score, weight, due_date, assign_date, graded_date, penalty, modify_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-          var args: [string, string, string, string, string, string, number, number, number, number, number, number, number, number] = [body.class_id, body.category_id, assignmentID, body.title, body.description, body.grade_id, body.act_score, body.max_score, body.weight, body.due_date, body.assign_date, body.graded_date, body.penalty, modifyDate];
+          var args: [string, string, string, string, string, string, number, number, number, number, number, number, number, number] = [body.course_id, body.category_id, assignmentID, body.title, body.description, body.grade_id, body.act_score, body.max_score, body.weight, body.due_date, body.assign_date, body.graded_date, body.penalty, modifyDate];
           con.query(sql, args, function (addasgErr: Object, result: Object) {
             if (!addasgErr) {
               callback(200, {
                 success: true,
-                message: "Successfully added assignment to category in class."
+                message: "Successfully added assignment to category in course."
               });
             } else {
               callback(500, {
@@ -119,7 +119,7 @@ function performAction(con: any, body: CreateAssignmentArgs, callback: (statusCo
           callback(400, {
             success: false,
             error: "ERR_EDIT_PERMISSSION",
-            message: "User does not have edit permissions for this class."
+            message: "User does not have edit permissions for this course."
           });
         }
       });

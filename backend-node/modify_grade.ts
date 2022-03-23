@@ -64,7 +64,7 @@ export function modifyGrade(con: any, req: any, callback: (stat: number, output:
  * @param {ModifyGradeArgs} body the arguments provided by the user
  */
 function validateInput(con: any, body: ModifyGradeArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.grade_id != null) {
+  if (body.internal_id != null && body.token != null && body.course_id != null && body.grade_id != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
     callback(400, {
@@ -86,20 +86,20 @@ function validateInput(con: any, body: ModifyGradeArgs, callback: (statusCode: n
  */
 function performAction(con: any, body: ModifyGradeArgs, callback: (statusCode: number, output: Object) => void) {
 
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+  getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
       var delSql = "DELETE FROM grade_scales WHERE class_id = ? AND grade_id = ?";
-      var delArgs: [string, string] = [body.class_id, body.grade_id];
+      var delArgs: [string, string] = [body.course_id, body.grade_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
         if (!delErr) {
           var sql = "INSERT INTO grade_scales (class_id, grade_id, min_score, max_score, credit) VALUES (?, ?, ?, ?, ?)";
-          var args: [string, string, number, number, number] = [body.class_id, body.grade_id, body.min_score, body.max_score, body.credit];
+          var args: [string, string, number, number, number] = [body.course_id, body.grade_id, body.min_score, body.max_score, body.credit];
 
           con.query(sql, args, function (grdErr: Object, result: Object) {
             if (!grdErr) {
               callback(200, {
                 success: true,
-                message: "Successfully modified grade to scale for class."
+                message: "Successfully modified grade to scale for course."
               });
             } else {
               callback(500, {
@@ -130,7 +130,7 @@ function performAction(con: any, body: ModifyGradeArgs, callback: (statusCode: n
       callback(400, {
         success: false,
         error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        message: "User does not have edit permissions for this course."
       });
     }
   });

@@ -85,6 +85,7 @@ function getCourseIDsForTermSequentially(con: any, termIDs: string[], current: n
           courseIDs.push(res[index].class_id);
         }
         terms[termID]["class_ids"] = courseIDs;
+        terms[termID]["course_ids"] = courseIDs;
 
         getCourseIDsForTermSequentially(con, termIDs, current + 1, terms, callback);
       } else {

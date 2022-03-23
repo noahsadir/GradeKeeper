@@ -23,7 +23,7 @@
 import {
   Credentials,
   QueryError,
-  ModifyClassArgs
+  ModifyCourseArgs
 } from './interfaces';
 
 import {
@@ -40,9 +40,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function modifyClass(con: any, req: any, callback: (stat: number, output: Object) => void) {
+export function modifyCourse(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
-  var body: ModifyClassArgs = req.body;
+  var body: ModifyCourseArgs = req.body;
 
   validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -61,10 +61,10 @@ export function modifyClass(con: any, req: any, callback: (stat: number, output:
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {ModifyClassArgs} body the arguments provided by the user
+ * @param {ModifyCourseArgs} body the arguments provided by the user
  */
-function validateInput(con: any, body: ModifyClassArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.class_name != null) {
+function validateInput(con: any, body: ModifyCourseArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null && body.course_id != null && body.class_name != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
     callback(400, {
@@ -82,24 +82,24 @@ function validateInput(con: any, body: ModifyClassArgs, callback: (statusCode: n
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {ModifyClassArgs} body the arguments provided by the user
+ * @param {ModifyCourseArgs} body the arguments provided by the user
  */
-function performAction(con: any, body: ModifyClassArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: ModifyCourseArgs, callback: (statusCode: number, output: Object) => void) {
   //Generate internal ID
 
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+  getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
       var delSql = "DELETE FROM classes WHERE class_id = ?";
-      var delArgs: [string] = [body.class_id];
+      var delArgs: [string] = [body.course_id];
       con.query(delSql, delArgs, (delErr: QueryError, delRes: any, delFields: Object) => {
         if (!delErr) {
           var sql = "INSERT INTO classes (class_id, class_name, class_code, color, weight, instructor, term_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-          var args: [string, string, string, number, number, string, string] = [body.class_id, body.class_name, body.class_code, body.color, body.weight, body.instructor, body.term_id];
+          var args: [string, string, string, number, number, string, string] = [body.course_id, body.class_name, body.class_code, body.color, body.weight, body.instructor, body.term_id];
           con.query(sql, args, function (addclaErr: Object, result: Object) {
             if (!addclaErr) {
               callback(200, {
                 success: true,
-                message: "Successfully modified class."
+                message: "Successfully modified course."
               });
             } else {
               callback(500, {
@@ -130,7 +130,7 @@ function performAction(con: any, body: ModifyClassArgs, callback: (statusCode: n
       callback(400, {
         success: false,
         error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        message: "User does not have edit permissions for this course."
       });
     }
   });

@@ -64,7 +64,7 @@ export function modifyAssignment(con: any, req: any, callback: (stat: number, ou
  * @param {ModifyAssignmentArgs} body the arguments provided by the user
  */
 function validateInput(con: any, body: ModifyAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.category_id != null && body.assignment_id != null) {
+  if (body.internal_id != null && body.token != null && body.course_id != null && body.category_id != null && body.assignment_id != null) {
     verifyToken(con, body.internal_id, body.token, callback);
   } else {
     callback(400, {
@@ -85,7 +85,7 @@ function validateInput(con: any, body: ModifyAssignmentArgs, callback: (statusCo
  * @param {ModifyAssignmentArgs} body the arguments provided by the user
  */
 function performAction(con: any, body: ModifyAssignmentArgs, callback: (statusCode: number, output: Object) => void) {
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+  getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (hasPermission && !editErr) {
       var delSql = "DELETE FROM items WHERE assignment_id = ?";
       var delArgs: [string] = [body.assignment_id];
@@ -93,7 +93,7 @@ function performAction(con: any, body: ModifyAssignmentArgs, callback: (statusCo
         if (!delErr) {
           var modifyDate = Math.round(Date.now() / 1000);
           var sql = "INSERT INTO items (class_id, category_id, assignment_id, title, description, grade_id, act_score, max_score, weight, due_date, assign_date, graded_date, penalty, modify_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-          var args: [string, string, string, string, string, string, number, number, number, number, number, number, number, number] = [body.class_id, body.category_id, body.assignment_id, body.title, body.description, body.grade_id, body.act_score, body.max_score, body.weight, body.due_date, body.assign_date, body.graded_date, body.penalty, modifyDate];
+          var args: [string, string, string, string, string, string, number, number, number, number, number, number, number, number] = [body.course_id, body.category_id, body.assignment_id, body.title, body.description, body.grade_id, body.act_score, body.max_score, body.weight, body.due_date, body.assign_date, body.graded_date, body.penalty, modifyDate];
           con.query(sql, args, function (asgErr: Object, result: Object) {
             if (!asgErr) {
               callback(200, {
@@ -129,7 +129,7 @@ function performAction(con: any, body: ModifyAssignmentArgs, callback: (statusCo
       callback(400, {
         success: false,
         error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        message: "User does not have edit permissions for this course."
       });
     }
   });

@@ -24,7 +24,7 @@ import {
   Credentials,
   QueryError,
   Timeslot,
-  SetClassScheduleArgs
+  SetCourseScheduleArgs
 } from './interfaces';
 
 import {
@@ -41,9 +41,9 @@ import {
  * @param {any} req the Express request
  * @param {any} res the Express result
  */
-export function setClassSchedule(con: any, req: any, callback: (stat: number, output: Object) => void) {
+export function setCourseSchedule(con: any, req: any, callback: (stat: number, output: Object) => void) {
 
-  var body: SetClassScheduleArgs = req.body;
+  var body: SetCourseScheduleArgs = req.body;
 
   validateInput(con, body, (viStatus: number, viOutput: Object) => {
     if (viStatus == 200) {
@@ -62,10 +62,10 @@ export function setClassSchedule(con: any, req: any, callback: (stat: number, ou
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {SetClassScheduleArgs} body the arguments provided by the user
+ * @param {SetCourseScheduleArgs} body the arguments provided by the user
  */
-function validateInput(con: any, body: SetClassScheduleArgs, callback: (statusCode: number, output: Object) => void) {
-  if (body.internal_id != null && body.token != null && body.class_id != null && body.timeslots != null) {
+function validateInput(con: any, body: SetCourseScheduleArgs, callback: (statusCode: number, output: Object) => void) {
+  if (body.internal_id != null && body.token != null && body.course_id != null && body.timeslots != null) {
     var validTimeslots: boolean = true;
 
     for (var i in body.timeslots) {
@@ -99,11 +99,11 @@ function validateInput(con: any, body: SetClassScheduleArgs, callback: (statusCo
  * @param {any} con the MySQL connection
  * @param {any} req the Express request
  * @param {any} res the Express result
- * @param {SetClassScheduleArgs} body the arguments provided by the user
+ * @param {SetCourseScheduleArgs} body the arguments provided by the user
  */
-function performAction(con: any, body: SetClassScheduleArgs, callback: (statusCode: number, output: Object) => void) {
+function performAction(con: any, body: SetCourseScheduleArgs, callback: (statusCode: number, output: Object) => void) {
   //Generate internal ID
-  getEditPermissionsForClass(con, body.class_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
+  getEditPermissionsForClass(con, body.course_id, body.internal_id, (hasPermission: boolean, editErr: QueryError) => {
     if (!editErr && hasPermission) {
       deleteSchedule(con, body, (delErr: QueryError) => {
         if (!delErr) {
@@ -111,7 +111,7 @@ function performAction(con: any, body: SetClassScheduleArgs, callback: (statusCo
             if (errInd >= body.timeslots.length - 1) {
               callback(200, {
                 success: true,
-                message: "Successfully set class schedule."
+                message: "Successfully set course schedule."
               });
             } else if (!atsErr) {
               callback(500, {
@@ -148,27 +148,27 @@ function performAction(con: any, body: SetClassScheduleArgs, callback: (statusCo
       callback(400, {
         success: false,
         error: "ERR_EDIT_PERMISSSION",
-        message: "User does not have edit permissions for this class."
+        message: "User does not have edit permissions for this course."
       });
     }
   });
 }
 
-function deleteSchedule(con: any, body: SetClassScheduleArgs, callback: (error: QueryError) => void) {
+function deleteSchedule(con: any, body: SetCourseScheduleArgs, callback: (error: QueryError) => void) {
   var sql = "DELETE FROM schedule WHERE class_id = ?";
-  var args: [string] = [body.class_id];
+  var args: [string] = [body.course_id];
 
   con.query(sql, args, (err: QueryError, res: any[]) => {
     callback(err);
   });
 }
 
-function addTimeSlotsRecursively(con: any, body: SetClassScheduleArgs, index: number, callback: (index: number, error: QueryError) => void) {
+function addTimeSlotsRecursively(con: any, body: SetCourseScheduleArgs, index: number, callback: (index: number, error: QueryError) => void) {
 
   var selectedTimeslot: Timeslot = body.timeslots[index];
   if (selectedTimeslot != null) {
     var sql = "INSERT INTO schedule (class_id, day_of_week, start_time, end_time, start_date, end_date, description, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    var args: [string, number, number, number, number, number, string, string] = [body.class_id, selectedTimeslot.day_of_week, selectedTimeslot.start_time, selectedTimeslot.end_time, selectedTimeslot.start_date, selectedTimeslot.end_date, selectedTimeslot.description, selectedTimeslot.address];
+    var args: [string, number, number, number, number, number, string, string] = [body.course_id, selectedTimeslot.day_of_week, selectedTimeslot.start_time, selectedTimeslot.end_time, selectedTimeslot.start_date, selectedTimeslot.end_date, selectedTimeslot.description, selectedTimeslot.address];
 
     con.query(sql, args, (err: QueryError, res: any[]) => {
       if (!err) {
